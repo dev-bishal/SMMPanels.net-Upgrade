@@ -1,0 +1,89 @@
+---
+import { metaDataEs } from '../pages/es/data';
+import { metaDataPt } from '../pages/pt/data';
+
+
+interface Props {
+    imageSrc : string,
+    panelTitle : string,
+    service : number,
+    rating : number,
+    avrg : number,
+    slugURL : string,
+    lang ?: string;
+}
+
+const {imageSrc ,panelTitle ,service, rating, avrg, slugURL, lang = "en"} = Astro.props;
+
+var ratingCollection : String[] = [];
+for (let j = 0; j < 5; j++) {
+    if(j < rating)
+        ratingCollection.push("fa-solid fa-star");
+    else
+        ratingCollection.push("fa-regular fa-star");
+}
+
+// console.log(imageSrc ,panelTitle ,descriptionText ,slugURL);
+let langDirectory = "";
+if(lang != "en"){
+    langDirectory = "/"+ lang
+}
+
+let contentPath;
+if(lang == "es") contentPath = metaDataEs
+else if(lang == "pt") contentPath = metaDataPt
+
+---
+<style is:inline>
+    /* article:hover img{
+        filter: brightness(.75);
+    } */
+    article:hover .data{
+        transform: translateY(0);
+    }
+</style>
+
+<article class="lg:w-[32%] md:w-[48%] overflow-hidden relative w-full rounded-lg shadow-sm hover:shadow-2xl hover:-translate-y-2 hover:scale-105 transition-all ease-in-out duration-150 group">
+        
+    <a class="relative flex justify-center items-center" href={langDirectory + "/panels/" + slugURL}>
+        <img src=
+        {
+            imageSrc != ""
+            ? imageSrc 
+            :"/assets/images/no-image-available.jpg"
+        } 
+        alt={panelTitle + " thumbnail"} class="h-64 w-full rounded-lg">
+
+    </a>
+    
+    <div class="data group-hover:translate-y-0 w-full rounded-b-lg text-white p-4 absolute translate-y-16 bg-[#00000069] backdrop-blur-sm bottom-0 left-0 transition-all ease-in-out duration-150">
+        <h2 class="font-bold text-center">
+            <a class="hover:underline" href={langDirectory + "/panels/" + slugURL}>{panelTitle}</a> 
+            <span class="inline-flex justify-center items-center size-5 rounded-full text-white bg-sky-500 shadow-lg shadow-blue-400">
+                <i class="fa-solid fa-angle-right"></i>
+            </span>
+        </h2>
+        
+        <span class="flex w-full justify-center gap-1 items-center text-yellow-400 text-sm my-2" title={`${rating} of 5`}>
+            {
+                ratingCollection.map(rating =>(
+                    <i class={rating.toString()}></i>
+                ))
+            } <span class="hidden">{`${rating}/5`}</span>
+        </span>
+        
+        <span class="flex items-center justify-between w-full min-h-6">
+            {(avrg && !Number.isNaN(avrg) ) && 
+            <span class="font-bold block"><i class="text-sky-500 fa-regular fa-money-bill-1-wave"></i> {lang == "en" ? "Avg Price" : contentPath?.text[21]} : ${`${avrg}`}</span>
+            }
+            <span class="block text-right">
+                {(service > 0) && <i class="text-sky-500 fa-solid fa-icons fa-fw"></i>}
+                {(service > 0) ? service.toString() : ""}
+                {(service > 1) && 
+                (lang == "en" ? "Services"  : contentPath?.text[23])}
+                {(service == 1) && 
+                (lang == "en" ? "Service" : contentPath?.text[22])}
+            </span>
+        </span>
+    </div>
+</article>

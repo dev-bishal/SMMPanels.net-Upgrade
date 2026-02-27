@@ -1,0 +1,59 @@
+---
+import MainLayoutNew from "../../layouts/MainLayoutNew.astro";
+import SMM_ServicesCardsNew from "../../components/SMM_servicesCardsNew.astro"
+import SearchFormNew from "../../components/SearchFormNew.astro";
+import { getAPIPath, getImageBasePath, optimizeImageUrl } from "../../data/utils";
+
+interface serviceSchema{
+    id: string,
+    serviceColor: string,
+    serviceLogo: string,
+    serviceTitle: string,
+    serviceCount: number,
+}
+
+//Fetching All Services
+const allServiceRes: serviceSchema[] = await fetch(getAPIPath() + "services").then(Response => Response.json());
+
+---
+
+<MainLayoutNew havePadding={false} title="List of all Services" metaDescription="">
+    <section class="services-container text-white pt-24">
+        
+        <h1 class="font-bold text-center text-2xl">Available Social Media Marketing Services</h1>
+
+        <div class="platform-list-wrapper my-6">
+            <div class="services-details w-full flex items-center justify-between flex-col lg:flex-row gap-3 bg-[#000000b9] p-7 uppercase">
+                <span class="lg:w-1/2 font-semibold">premium platforms- 
+                    <span class="count">{allServiceRes.length}</span>
+                </span>
+                
+                <div class="searchBox flex justify-center items-center lg:w-1/2 w-full">
+                    <div class="wrapper w-full">
+                        <SearchFormNew searchPagePath={"/services/search"} isDark={true}/>
+                    </div>
+                </div>
+            </div>
+            <div class="content-wrapper w-full bg-[#00000089] flex flex-wrap justify-center">
+        
+                {
+                    allServiceRes.map((service, index)=>(
+                        <SMM_ServicesCardsNew 
+                            servicesCount={service.serviceCount} 
+                            title={service.serviceTitle} 
+                            imageLogoPath={getImageBasePath() + service.serviceLogo}>
+                        </SMM_ServicesCardsNew>
+                    ))
+                }
+    
+            </div>
+        </div>
+        
+    </section>
+</MainLayoutNew>
+
+<script is:inline src="/assets/scripts/main.js"></script>
+
+<script is:inline>
+    allowServiceCardClick(".content-wrapper")
+</script>

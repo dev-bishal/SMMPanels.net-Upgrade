@@ -1,0 +1,183 @@
+---
+import { getImageBasePath } from '../data/utils';
+import { metaDataEs } from '../pages/es/data';
+import { metaDataPt } from '../pages/pt/data';
+import ButtonUI from './ButtonUI.astro';
+import GlassLayout from './GlassLayout.astro';
+
+interface Props {
+    allServicesData : any[],
+    lang ?: string
+}
+
+const {allServicesData , lang="en"} = Astro.props;
+let contentPath;
+if(lang == "es") contentPath = metaDataEs
+else if(lang == "pt") contentPath = metaDataPt
+
+let titleText;
+if(lang == "en"){
+    allServicesData.length >= 10
+    ? titleText = `Available Services for ${allServicesData.length - 5 }+ Platforms`
+    : titleText = `Available Service for ${allServicesData.length } Platform`
+}
+else if(lang == "es"){
+    allServicesData.length >= 10
+    ? titleText = `${contentPath?.text[6]} ${allServicesData.length - 5 }+ ${contentPath?.text[7]}`
+    : titleText = `${contentPath?.text[6]} ${allServicesData.length } ${contentPath?.text[7]}`
+}
+
+---
+<style is:inline>
+    swiper-container{
+        font-size: larger;
+        font-weight: 500;
+    }
+    swiper-container.servicesSwiper {
+        width: 100%;
+        height: fit-content;
+    }
+
+    swiper-container.servicesSwiper swiper-slide {
+        background-position: center;
+        background-size: cover;
+        width: 300px;
+    }
+
+    swiper-container.servicesSwiper swiper-slide img {
+        display: block;
+    }
+</style>
+
+<section class="servicesSection">
+    <div class="wrapper z-[2] relative size-full flex justify-center items-center text-white">
+        <div class="content w-full py-6"
+            data-aos="fade-up"
+            data-aos-delay="500">
+            <span class="flex w-full lg:justify-between lg:items-center gap-2 mb-3 flex-col lg:flex-row">
+                <h2 class="uppercase text-xl text-white font-bold">
+                    {
+                        allServicesData.length > 0 && titleText
+                    }
+                </h2>
+                
+                <ButtonUI link="/services" title={
+                    lang == "en" 
+                        ? 'Show All'
+                        : contentPath?.text[8] || ""
+                    }></ButtonUI>
+            </span>
+            <swiper-container class="servicesSwiper" init="false">
+                {
+                    allServicesData.slice(0, 10).map((panel_service)=>(
+                        <swiper-slide class="mb-3 flex justify-center items-center overflow-visible">
+                            <GlassLayout otherClass={`w-full p-3 hover:scale-105 hover:shadow-xl transition-all ease-in-out`}>
+                                <a href={"/services/"+ panel_service.serviceTitle.toLowerCase().replaceAll(" ", "-")} class="content flex relative items-center gap-3 z-1">
+                                    <img
+                                        class="brandImg size-[64px] rounded-md"
+                                        src={getImageBasePath() + panel_service.serviceLogo}
+                                        alt={panel_service + " Service "}
+                                    />
+                                    <span>{panel_service.serviceTitle}</span>
+                                </a>
+                            </GlassLayout>
+                        </swiper-slide>
+                    ))
+                }
+            </swiper-container>
+            <swiper-container class="servicesSwiperRev" init="false">
+                {
+                    allServicesData.slice(10, 20).map((panel_service)=>(
+                        <swiper-slide class="mb-3 flex justify-center items-center overflow-visible">
+                            <GlassLayout otherClass={`w-full p-3 hover:scale-105 hover:shadow-xl transition-all ease-in-out`}>
+                                <a href={"/services/"+ panel_service.serviceTitle.toLowerCase().replaceAll(" ", "-")}  class="content flex relative items-center gap-3 z-1">
+                                    <img
+                                        class="brandImg size-[64px] rounded-md"
+                                        src={getImageBasePath() + panel_service.serviceLogo}
+                                        alt={panel_service + " Service "}
+                                    />
+                                    <span>{panel_service.serviceTitle}</span>
+                                </a>
+                            </GlassLayout>
+                        </swiper-slide>
+                    ))
+                }
+            </swiper-container>
+        </div>
+    </div>
+</section>
+<!-- <span class="size-[160px] flex justify-center items-center bg-center bg-contain bg-no-repeat" class:list={[`]}></span> -->
+
+<script is:inline>
+    const swiperEl = document.querySelector(
+        ".servicesSection swiper-container",
+    );
+    const swiperElRev = document.querySelector(
+        ".servicesSection swiper-container.servicesSwiperRev",
+    );
+
+    Object.assign(swiperEl, {
+        loop: "true",
+        freeMode: "true",
+        autoplay: {
+            delay: 0,
+            disableOnInteraction: false,
+        },
+        speed: "3500",
+        slidesPerView: 2,
+        spaceBetween: 30,
+
+        breakpoints: {
+            "@0.00": {
+                slidesPerView: 2,
+                spaceBetween: 10,
+            },
+            "@0.75": {
+                slidesPerView: 2.8,
+                spaceBetween: 20,
+            },
+            "@1.00": {
+                slidesPerView: 3,
+                spaceBetween: 40,
+            },
+            "@1.50": {
+                slidesPerView: 4.5,
+                spaceBetween: 30,
+            },
+        },
+    });
+    Object.assign(swiperElRev, {
+        loop: "true",
+        freeMode: "true",
+        autoplay: {
+            delay: 0,
+            disableOnInteraction: false,
+            reverseDirection : true,
+        },
+        speed: "3500",
+        slidesPerView: 2,
+        spaceBetween: 30,
+
+        breakpoints: {
+            "@0.00": {
+                slidesPerView: 2,
+                spaceBetween: 10,
+            },
+            "@0.75": {
+                slidesPerView: 2.8,
+                spaceBetween: 20,
+            },
+            "@1.00": {
+                slidesPerView: 3,
+                spaceBetween: 40,
+            },
+            "@1.50": {
+                slidesPerView: 4.5,
+                spaceBetween: 30,
+            },
+        },
+    });
+
+    swiperEl.initialize();
+    swiperElRev.initialize();
+</script>

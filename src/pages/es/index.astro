@@ -1,19 +1,18 @@
 ---
-import { removeHTMLTags, getAPIPath, getImageBasePath, JsonToHtml } from '../data/utils'
-import GlassLayout from "../components/GlassLayout.astro";
-import SearchFormNew from "../components/SearchFormNew.astro";
-import ServicesSlider from "../components/ServicesSlider.astro";
-import SMM_panelCardsNew from "../components/SMM_panelCardsNew.astro";
-import ButtonUI from '../components/ButtonUI.astro';
-import MainLayoutNew from "../layouts/MainLayoutNew.astro";
+import GlassLayout from "../../components/GlassLayout.astro";
+import SearchFormNew from "../../components/SearchFormNew.astro";
+import SMM_panelCardsNew from "../../components/SMM_panelCardsNew.astro";
+import ServicesSlider from "../../components/ServicesSlider.astro";
+import { getAPIPath, getImageBasePath } from "../../data/utils";
+import MainLayoutNew from "../../layouts/MainLayoutNew.astro";
+import { metaDataEs } from "./data";
+import ButtonUI from "../../components/ButtonUI.astro";
+
+let contentPath = metaDataEs
 
 interface serviceSchema{
     serviceColor: string,
-    serviceLogo: {
-        name: string,
-        mediaType: string,
-        url: string,
-    },
+    serviceLogo: string,
     serviceTitle: string,
 }
 
@@ -30,7 +29,7 @@ interface panelStructure {
 	panelAPIKey: string;
 	panelAPILink: string;
 	panelSlug: string;
-	panelMetaDescription: string;
+	panelMetaDescriptionES: string;
 	panelTitle: string;
 	panelTotalServices: number;
 	panelWebsiteURL: string;
@@ -39,7 +38,6 @@ interface panelStructure {
 const allPanels = await fetch(getAPIPath() + "panels");
 const responsePanels = await allPanels.json();
 const panelsList = responsePanels.reverse();
-
 let secondListStartIndex;
 if(responsePanels.length <= 3) secondListStartIndex = 0
 else secondListStartIndex = 3;
@@ -49,14 +47,13 @@ else secondListStartIndex = 3;
 ); */
 
 const allSidebarWidgetsFetch :any[] = [];
-
 ---
 <style is:inline>
     .article-Schema:nth-child(1):hover .textContent{
         transform: translate(0, 0);
     }
 </style>
-<MainLayoutNew title="Home">
+<MainLayoutNew title="Home" lang={metaDataEs.language}>
 	
 	<!-- Hero section -->
 	<GlassLayout otherClass='mt-20 my-6 px-5'>
@@ -64,10 +61,10 @@ const allSidebarWidgetsFetch :any[] = [];
             <div class="hero-content flex flex-col lg:flex-row justify-center items-center h-full w-full">
                 <div data-aos="fade-right" data-aos-delay="2500"
                     class="part lg:w-1/2 mt-10 lg:mt-0 h-full flex flex-col justify-center gap-5 text-white">
-                    <h2 class="font-semibold text-5xl">Welcome to {allSiteFetch.SiteTitle}</h2>
-                    <p>{allSiteFetch.homeHeaderPara}</p>
+                    <h2 class="font-semibold text-5xl">{`${contentPath.text[4]} ${allSiteFetch.SiteTitle}`}</h2>
+                    <p>{allSiteFetch.homeHeaderParaEs}</p>
                     <div class="CTABtn flex gap-3">
-						<SearchFormNew searchPagePath="/search"/>
+						<SearchFormNew lang={metaDataEs.language} searchPagePath=`/${metaDataEs.language}/search`/>
                     </div>
                 </div>
                 <div data-aos="fade-left" data-aos-delay="2500" class="part lg:w-1/2 h-full flex justify-center items-center">
@@ -80,20 +77,20 @@ const allSidebarWidgetsFetch :any[] = [];
     <!-- Services Slider section -->
     {
         allServiceRes.length > 0 &&
-        <ServicesSlider allServicesData={allServiceRes} />
+        <ServicesSlider lang={metaDataEs.language} allServicesData={allServiceRes} />
     }
 
     <!-- Panels Sections-->
     <section class="panel-container relative w-full flex flex-col justify-center items-center">
+        
         {
             (responsePanels.length == 0) 
             ? <h2 class="text-xl font-semibold text-center text-white">No Panel is listed at the moment.</h2>
             : <div class="wrapper lg:w-[1100px] h-full lg:pt-24 pb-12 flex items-center flex-col gap-5 overflow-hidden px-5 lg:px-0">
-                <h3 class="text-yellow-400 font-semibold text-center">Some Latest SMM Panels</h3>
-                <p class="text-white font-bold text-3xl lg:w-[60%] text-center">Explore the most recently added SMM Panels and more...</p>
+                <h3 class="text-yellow-400 font-semibold text-center">{contentPath.text[9]}</h3>
+                <p class="text-white font-bold text-3xl lg:w-[60%] text-center">{contentPath.text[10]}</p>
               </div>
         }
-
         {
             (responsePanels.length > 0 && responsePanels.length > 3) && 
             
@@ -102,14 +99,10 @@ const allSidebarWidgetsFetch :any[] = [];
     
                 <div data-aos="fade-right" class="part lg:w-1/2 h-full flex flex-col justify-center gap-5 leading-6">
                     <article class="article-Schema relative overflow-hidden flex flex-col justify-center rounded-lg transition-all ease-in-out hover:shadow-xl group">
-                        <img src={
-                            panelsList[0].panelFeaturedImage
-                            ? getImageBasePath() + panelsList[0].panelFeaturedImage
-                            : "assets/images/no-image-available.jpg"
-                        } class="rounded-lg hover:brightness-75 w-full" />
+                        <img src={getImageBasePath() + panelsList[0].panelFeaturedImage} class="rounded-lg hover:brightness-75 w-full" />
                         <div class="textContent absolute translate-y-full bg-[#000000e2] p-6 bottom-0 transition-all ease-in-out duration-500 w-full group-hover:translate-y-0">
                             <a class="contents hover:text-blue-300" href={"/panels/"+ panelsList[0].panelSlug}><h3 class="w-fit cursor-pointer font-bold text-xl line-clamp-2">{panelsList[0].panelTitle}</h3></a>
-                            <span class="description text-xs" set:html={panelsList[0].panelMetaDescription.substring(0, 150) + "..."}></span>
+                            <span class="description text-xs" set:html={panelsList[0].panelMetaDescriptionES.substring(0, 150) + "..."}></span>
                         </div>
                     </article>
                 </div>
@@ -117,17 +110,13 @@ const allSidebarWidgetsFetch :any[] = [];
                 <div data-aos="fade-left" class="part lg:w-1/2 h-auto flex flex-col gap-[20px] justify-between items-center">
 
                     {
-                        panelsList.slice(1, 3).map((panel:any)=>(
+                        panelsList.slice(1, 3).map((panel:any, index: number)=>(
                             <article class="article-Schema flex lg:w-auto w-full flex-col lg:flex-row justify-center p-3 rounded-lg bg-[#00000035] gap-3 transition-all ease-in-out hover:scale-105 hover:shadow-xl">
-                                <img src={
-                                    panel.panelFeaturedImage
-                                    ? getImageBasePath() + panel.panelFeaturedImage
-                                    : "assets/images/no-image-available.jpg"
-                                }
+                                <img src={getImageBasePath() + panel.panelFeaturedImage}
                                     class="rounded-lg lg:w-[15rem] lg:h-[9rem] object-cover hover:brightness-75" />
                                 <span class="details">
-                                    <a class="contents hover:text-blue-300" href={"/panels/"+ panel.panelSlug}><h3 class="w-fit cursor-pointer font-bold text-xl line-clamp-2">{panel.panelTitle}</h3></a>
-                                    <span class="hidden lg:block description my-3 text-sm line-clamp-3" set:html={panel.panelMetaDescription.substring(0, 150) + "..."}></span>
+                                    <a class="contents hover:text-blue-300" href={"/es/panels/"+ panel.panelSlug}><h3 class="w-fit cursor-pointer font-bold text-xl line-clamp-2">{panel.panelTitle}</h3></a>
+                                    <span class="hidden lg:block description my-3 text-sm line-clamp-3" set:html={panelsList[0].panelMetaDescriptionES.substring(0, 150) + "..."}></span>
                                 </span>
                             </article>
                         ))
@@ -136,17 +125,19 @@ const allSidebarWidgetsFetch :any[] = [];
                 </div>
             </div>
         }
-
+        
         <div class="older-panels-container mt-4 w-full flex flex-col md:flex-row gap-5">
+
             <div class="panel-container lg:w-[65%] py-5">
                 {
                     (responsePanels.length == 3 || (responsePanels.length > 0))
                         && 
                         <div class="wrapper flex justify-center items-center flex-wrap gap-7">
                         {
-                            panelsList.slice(secondListStartIndex, allSiteFetch.homePanelCount).map((panel: panelStructure) => (
+                            panelsList.slice(secondListStartIndex, allSiteFetch.homePanelCount).map((panel: panelStructure, index:number) => (
                                 <SMM_panelCardsNew
-                                    descriptionText={panel.panelMetaDescription}
+                                    lang ={metaDataEs.language}
+                                    descriptionText={panel.panelMetaDescriptionES}
                                     imageSrc = {panel.panelFeaturedImage == null ? "" : panel.panelFeaturedImage }
                                     panelTitle={panel.panelTitle}
                                     slugURL={panel.panelSlug}
@@ -158,11 +149,11 @@ const allSidebarWidgetsFetch :any[] = [];
                 {
                     (responsePanels.length > 3) &&
                         <span class="flex justify-center items-center w-full my-4">
-                                <ButtonUI title='See All' link='/panels'></ButtonUI>
+                                <ButtonUI title={contentPath.text[11]} link='/es/panels'></ButtonUI>
                         </span>
                 }
             </div>
-
+    
             <aside class="lg:w-[35%] py-5 flex flex-col gap-y-4">
                
                 {
@@ -174,8 +165,8 @@ const allSidebarWidgetsFetch :any[] = [];
                 }
     
             </aside>
+            
         </div>
-        
     </section>
 
 </MainLayoutNew>

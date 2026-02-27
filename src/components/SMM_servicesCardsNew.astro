@@ -1,0 +1,38 @@
+---
+import {formatNumberShort} from "../data/utils"
+import { metaDataEs } from "../pages/es/data";
+import { metaDataPt } from "../pages/pt/data";
+interface Props {
+    title:string,
+    servicesCount ?: number,
+    imageLogoPath : string,
+    lang ?: string
+}
+
+const {title, servicesCount=0, imageLogoPath, lang = "en"} = Astro.props;
+
+let contentPath, path;
+if(lang == "es") {
+    contentPath = metaDataEs;
+    path = "/es"
+}
+else if(lang == "pt") {
+    contentPath = metaDataPt
+    path = "/pt"
+}
+else if(lang == "en") path = ""
+---
+<article class="lg:w-1/4 select-none w-1/2 cursor-pointer p-5 flex flex-col justify-center items-center gap-2 text-cente border border-transparent transition-all ease-in-out duration-200 active:scale-95 hover:bg-[#0000006b] shadow-2xl hover:shadow-gray-700 hover:border-gray-400">
+    <a href={path + "/services/"+ title.toLowerCase().replaceAll(" ", "-")}>
+        <img alt={title} class="rounded-full bg-white size-20 " src={imageLogoPath} />
+        <h2 class="font-semibold hover:underline"><a href={path + "/services/"+ title.toLowerCase().replaceAll(" ", "-")}>{title}</a></h2>
+        {
+            formatNumberShort(servicesCount) != "0" &&
+            <span title={servicesCount.toString()}>{formatNumberShort(servicesCount)} {
+                lang == "en" 
+                ? "Services"
+                : contentPath?.text[3]
+            }</span>
+        }
+    </a>
+</article>

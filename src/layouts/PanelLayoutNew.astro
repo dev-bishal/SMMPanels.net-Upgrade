@@ -1,0 +1,81 @@
+---
+import { SEO } from "astro-seo";
+
+import NavbarNew from "../components/NavbarNew.astro";
+import FooterNew from "../components/FooterNew.astro";
+import { getAPIPath } from "../data/utils";
+interface Props {
+    title:string,
+    metaDescription?:string,
+    pageType ?: string,
+    pageFeaturedImage ?: string
+}
+
+//Fetching Site Settings
+const allSiteFetch:any = await fetch(getAPIPath() + "siteSettings/" + import.meta.env.SITESETTINGSKEY).then(Response => Response.json());
+
+const {
+    title, 
+    metaDescription = allSiteFetch.siteMetaDescription,
+    pageType = "website",
+    pageFeaturedImage = allSiteFetch.siteFavicon.url,
+    } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href={allSiteFetch.siteFavicon.url} type="image/x-icon">
+    <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.5.1/css/all.css">
+    <meta name="generator" content={Astro.generator} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    
+    <SEO
+      title={`${title} - ${allSiteFetch.SiteTitle}`}
+      description={metaDescription}
+      openGraph={{
+        basic: {
+          title: `${title} - ${allSiteFetch.SiteTitle}`,
+          type: pageType,
+          image: pageFeaturedImage,
+        }
+      }}
+      twitter={{
+        creator: "@Jack"
+      }}
+      extend={{
+        // extending the default link tags{allSiteFetch.siteFavicon.url}
+        link: [{ rel: "icon", href: allSiteFetch.siteFavicon.url }],
+        // extending the default meta tags
+        meta: [
+          {
+            name: "twitter:image",
+            content: pageFeaturedImage,
+          },
+          { name: "twitter:title", content: `${title} - ${allSiteFetch.SiteTitle}` },
+          { name: "twitter:description", content: metaDescription },
+        ],
+      }}
+    />
+    
+</head>
+<body>
+    <NavbarNew logoImgSrc={allSiteFetch.siteLog.url} siteTitle={allSiteFetch.SiteTitle}/>
+    
+    <div class="main-placeholder py-5 flex justify-center items-center bg-slate-100">
+        <div class="main-container lg:w-[1150px]">
+            <main class="lg:min-h-[60vh]">
+                <slot /> <!-- Main Content Placeholder -->
+            </main>
+        </div>
+    </div>
+    
+    <FooterNew logoImgSrc={allSiteFetch.siteLog.url} siteTitle={allSiteFetch.SiteTitle}/>
+
+    <script is:inline>
+      console.log("This website is developed by Bishal Biswas. https://bishalbiswas.dev/")
+    </script>
+</body>
+</html>

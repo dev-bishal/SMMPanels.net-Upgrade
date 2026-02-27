@@ -1,0 +1,50 @@
+---
+import Prose from "../../../components/Prose.astro";
+import { getAPIPath, getLanguage, JsonToHtml } from "../../../data/utils";
+import MainLayoutNew from "../../../layouts/MainLayoutNew.astro";
+import { metaDataPt } from "../data";
+export const prerender = true;
+
+interface pageSchema{
+    pageTitle  : string,
+    pageContent  : string,
+    PageDescriptionPT  : string,
+    pageSlug  : string,
+}
+
+export async function getStaticPaths (){
+
+    const allPagesFetch:any = await fetch(getAPIPath() + "pages")
+    const allPageRes : pageSchema[] = await allPagesFetch.json();
+    
+    for (let i = 0; i < allPageRes.length; i++) {
+        if(allPageRes[i].pageTitle.toLowerCase().includes("contact")){
+            allPageRes.splice(i, 1);
+        }
+    }
+
+    return allPageRes.map((page:any) => (
+        {
+            params : { slug: page.pageSlug },
+            props: { page },
+        }
+    ))
+
+} ;
+
+const { page } = Astro.props;
+
+---
+
+<MainLayoutNew lang={metaDataPt.language} title={page.pageTitle} metaDescription={page.pageMetaDescriptionPT}>
+    <div class="content-wrapper text-white flex flex-wrap lg:justify-start justify-center gap-5 my-6 px-5 lg:mt-24 mt-20">
+
+        <article class="text-white">
+            <Prose>
+                <h1>{page.pageTitle}</h1>
+                <div class="content" set:html={page.pageTextDescriptionPT}></div>
+            </Prose>
+        </article>
+
+    </div>
+</MainLayoutNew>

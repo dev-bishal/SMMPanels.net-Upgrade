@@ -1,0 +1,145 @@
+export let metaDataPt= {
+    language : "pt",
+    text : [
+        "Início",
+        "Painéis SMM",
+        "Opções de Pagamento",
+        "Serviços",
+    
+        "Bem-vindo ao",
+        "Pesquisar Serviços do YouTube",
+        "Serviços Disponíveis para",
+        "Plataformas",
+        "Mostrar Tudo",
+        "Alguns dos Últimos Painéis SMM",
+        "Explore os painéis SMM mais recentes e muito mais...",
+        "Ver Tudo",
+        "Sobre Nós",
+        "Política de Privacidade",
+        "Isenção de Responsabilidade",
+        "Contato",
+        "Copyright © ",
+        "Todos os direitos reservados",
+    
+        "Comparar Painéis SMM",
+        "Descubra os melhores painéis SMM, confira seus serviços e ofertas e encontre o painel SMM certo para você! Leve sua marca para o próximo nível comprando os melhores sinais, curtidas, seguidores e muito mais!",
+        "Confira nossos painéis SMM favoritos abaixo",
+        "Preço Médio",
+        "Serviço",
+        "Serviços",
+        "Mostrando Resultados",
+    
+        "Opções de Pagamento aceitas pelos Melhores Painéis SMM",
+        "Explore uma lista abrangente de opções de pagamento aceitas pelos principais painéis SMM. Desde carteiras digitais até cartões de crédito e criptomoedas, descubra formas de pagamento flexíveis e seguras que atendam às suas necessidades. Se você procura métodos de pagamento rápidos, internacionais ou sem complicações, encontre a melhor opção para seus objetivos de marketing. Escolha o painel que melhor se adapta ao seu método de pagamento preferido e comece a expandir sua presença nas redes sociais hoje mesmo!",
+        "Lista de Métodos de Pagamento aceitos pelos nossos Painéis SMM listados",
+    
+        "Serviços de Marketing para Redes Sociais Disponíveis",
+        "Plataformas premium",
+    
+        "Visite",
+        "Ver Todos os Painéis SMM",
+        "Serviços Disponíveis",
+        "Preço Médio",
+        "de",
+        "Estrelas",
+        "Opções de Pagamento",
+        "Método",
+        "Depósito Mínimo",
+        "Bônus",
+        "20 Últimos Serviços de",
+        "N°",
+        "Serviço",
+        "Pedido Mínimo",
+        "Pedido Máximo",
+        "Tarifa por 1000",
+        "Painéis SMM Relacionados",
+    
+        "Encontre todos os painéis SMM que oferecem",
+        "como opção de pagamento",
+        "Painéis SMM com advcash Logoadvcash",
+        "Depósito Mínimo",
+        "Bônus",
+    
+        "Serviços Disponíveis",
+        "Painéis que Oferecem Serviços",
+        "Serviços",
+        "Painel SMM",
+    
+        "Escreva sua mensagem",
+        "Seu Nome",
+        "Seu Endereço de E-mail",
+        "Sua Mensagem",
+        "Enviar Mensagem"
+    ],
+
+    /* data : [
+       "Home",
+       "SMM Panels",
+       "Payment Options",
+       "Services", 
+
+       "Welcome to SMMPanels.net",
+       "Search YouTube Services",
+       "Available Services for"
+       "Platforms",
+       "Show All",
+       "Some Latest SMM Panels",
+        "Explore the most recently added SMM Panels and more...",
+        "See All",
+        "About Us",
+        "Privacy Policy",
+        "Disclaimer",
+        "Contact Us",
+        "Copyright © SMMPanels.net 2025 | All Rights reserved",
+
+        "Compare SMM Panels",
+        "Discover the best SMM Panels, checkout their services & offers and find the right SMM Panel for you! Bring your brand to the next level by buying the best signals, likes, followers & much more!",
+        "Check out our favorite SMM Panels below",
+        "Avg Price",
+        "Service",
+        "Services",
+        "Showing Results",
+
+        "Payment Options supported by Top SMM Panels",
+        "Explore a comprehensive list of payment options accepted by leading SMM panels. From digital wallets to credit cards and cryptocurrency, discover flexible and secure ways to pay that suit your needs. Whether you're looking for quick, international, or hassle-free payment methods, find the best option for your marketing goals. Choose the panel with the perfect fit for your preferred payment solution and start growing your social media presence today!",
+        "List of Payment Methods supported by our listed SMM Panels",
+
+        "Available Social Media Marketing Services",
+        "premium platforms",
+
+        "Visit SocialPanel24.com",
+        "Check All SMM Panels",
+        "Services Available",
+        "Average Price",
+        "out of",
+        "Stars"
+        "Payment Options",
+        "Method",
+        "Minimum Deposit",
+        "Bonus",
+        "20 Latest Services by SocialPanel24.com",
+        "S.No",
+        "Service",
+        "Min order",
+        "Max order",
+        "Rate per 1000",
+        "Related SMM Panels",
+
+        "Find all SMM panels that offer
+        "as a payment option",
+        "SMM Panels with advcash Logoadvcash",
+        "Min Deposit",
+        "Bonus",
+
+        "Services Available",
+        "Panels Providing Services",
+        "Services",
+        "SMM Panel"
+
+        "Write your message",
+        "Your Name",
+        "Your Email Address",
+        "Your Message",
+        "Send Message"
+    ] */
+}

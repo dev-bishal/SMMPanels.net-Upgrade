@@ -1,0 +1,79 @@
+---
+import { metaDataEs } from '../pages/es/data';
+import { metaDataPt } from '../pages/pt/data';
+
+
+interface Props {
+    imageSrc : string,
+    panelTitle : string,
+    slugURL : string,
+    payMethods : any,
+    requiredPaymentMatch : string,
+    lang ?: string
+}
+
+const {imageSrc ,panelTitle, slugURL, payMethods, requiredPaymentMatch, lang = "en"} = Astro.props;
+let minDepo, bonus;
+
+for (let i = 0; i < payMethods.length; i++) {
+    if(payMethods[i].payOption.toLowerCase().replaceAll(" ", "-").replaceAll("/", "-") === requiredPaymentMatch)
+    {
+        minDepo = payMethods[i].payDepo;
+        bonus = payMethods[i].payBonus
+    }
+}
+let langDirectory = "";
+if(lang != "en"){
+    langDirectory = "/"+ lang
+}
+
+let contentPath;
+if(lang == "es") contentPath = metaDataEs
+else if(lang == "pt") contentPath = metaDataPt
+---
+<style is:inline>
+    /* article:hover img{
+        filter: brightness(.75);
+    } */
+    article:hover .data{
+        transform: translateY(0);
+    }
+</style>
+
+<article class="lg:w-[32%] md:w-[48%] overflow-hidden relative w-full rounded-lg shadow-sm hover:shadow-2xl hover:scale-105 transition-all ease-in-out duration-150">
+        
+    <a class="relative flex justify-center items-center" href={langDirectory + "/panels/" + slugURL}>
+        <img src=
+        {
+            imageSrc != ""
+            ? imageSrc 
+            :"/assets/images/no-image-available.jpg"
+        } 
+        alt={panelTitle + " thumbnail"} class="h-64 w-full rounded-lg">
+
+    </a>
+    
+    <div class="data w-full rounded-b-lg text-white p-4 absolute bg-[#00000069] backdrop-blur-sm bottom-0 left-0 transition-all ease-in-out duration-150">
+        <h2 class="font-bold text-center">
+            <a class="hover:underline" href={langDirectory + "/panels/" + slugURL}>{panelTitle}</a> 
+            <span class="inline-flex justify-center items-center size-5 rounded-full text-white bg-sky-500 shadow-lg shadow-blue-400">
+                <i class="fa-solid fa-angle-right"></i>
+            </span>
+        </h2>
+        
+        <span class="flex items-center justify-between w-full">
+            <span class="font-bold block"><i class="text-sky-500 fa-regular fa-money-bill-1-wave"></i> {
+                lang == "en" 
+                ? "Min Deposit"
+                : contentPath?.text[50]    
+            } : {`${minDepo}`}</span>
+            <span class="font-bold block text-right">
+                {
+                    bonus && 
+                    <i class="text-sky-500 fa-solid fa-icons fa-fw"></i>
+                    <>{lang == "en" ? "Bonus" : contentPath?.text[51] } {bonus}</>
+                }
+            </span>
+        </span>
+    </div>
+</article>

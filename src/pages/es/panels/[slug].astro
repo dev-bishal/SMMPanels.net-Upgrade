@@ -1,0 +1,545 @@
+---
+import GlassLayout from '../../../components/GlassLayout.astro';
+import { getAPIPath, getImageBasePath, getRandomElements, JsonToHtml, makeWordsClickable, shuffleArray } from '../../../data/utils';
+import MainLayoutNew from '../../../layouts/MainLayoutNew.astro';
+import SMM_panelCardsBelow from "../../../components/SMM_panelCardsBelow.astro";
+import { metaDataEs } from '../data';
+
+let contentPath = metaDataEs
+
+//import servicePlatformsData from "../../data/temp-services";
+var APIError = "";
+
+const allServicesFetch = await fetch(getAPIPath() + "services");
+const allServices = await allServicesFetch.json();
+
+let allPanelsData2: panelSchema[] = await fetch(getAPIPath() + "panels").then(Response => Response.json());
+
+export const prerender = true;
+export async function getStaticPaths() {
+    const allPanelsFetch: any = await fetch(getAPIPath() + "panels");
+    const allPanelRes: panelSchema[] = await allPanelsFetch.json();
+    
+    return allPanelRes.map((panel: any) => ({
+        params: { slug: panel.panelSlug },
+        props: { panel },
+    }));
+}
+
+// Fetching All Payment Methods for internal Linking and Images
+const allPaymentOptions: any = await fetch(getAPIPath() + "payments").then(Response => Response.json());
+
+const { panel } = Astro.props;
+const { slug } = Astro.params;
+// console.log(panel);
+
+var ratingCollection: String[] = [];
+for (let j = 0; j < 5; j++) {
+    if (j < panel.rating) ratingCollection.push("fa-solid fa-star");
+    else ratingCollection.push("fa-regular fa-star");
+}
+
+// console.log("Rating Stars Classes", ratingCollection);
+
+var servicesResponse : any = [];
+var platformList: any = [];
+var randomPlatformList: any = [];
+var platformListTitles: any = [];
+var averagePrice: number = 0,totalPrice : number = 0;
+
+// Fetching Panel's Serivces
+try {
+    // With GET Method
+    try {
+        servicesResponse = await fetch(`${panel.panelAPILink}?key=${panel.panelAPIKey}&action=services`).
+        then(Response => Response.json());        
+    } catch (error) {
+        console.log("GET Method Failed");
+    }
+
+    //With POST Method
+    try {
+        servicesResponse = await fetch(`${panel.panelAPILink}?key=${panel.panelAPIKey}&action=services`, {method:'POST'}).
+    then(Response => Response.json());
+    } catch (error) {
+        console.log("POST Method Failed");
+    }
+
+    if(servicesResponse.length == 0 || servicesResponse.length == undefined)
+    throw new Error("BOTH Request Failed (Might need to Update API Key)");
+    
+} catch (error : any) {
+    console.log(error.message);
+    servicesResponse = []
+}
+
+for (let i = 0; i < allPanelsData2.length; i++) {
+    if(allPanelsData2[i].panelSlug === slug)
+        allPanelsData2.splice(i, 1);
+}
+allPanelsData2 = shuffleArray(allPanelsData2);
+
+let allServiceNames: string[] = [];
+for (let j = 0; j < servicesResponse.length; j++) {
+    if((Number(servicesResponse[j].rate) < 850) && (Number(servicesResponse[j].rate) > 0.0001))
+        totalPrice += Number(servicesResponse[j].rate);
+}
+if(servicesResponse.length != 0 && (typeof servicesResponse === 'string') == false)
+    averagePrice= totalPrice/servicesResponse.length;
+
+if(servicesResponse.length != 0 && (typeof servicesResponse === 'string') == false) {
+    
+    // Collecting Services names which are available in the Panels API Services
+    servicesResponse.map((service: any) =>
+        allServiceNames.push(service.name.toLowerCase()),
+    );
+    
+    
+    for (let i = 0; i < allServices.length; i++) {
+        for (let j = 0; j < allServiceNames.length; j++) {
+            if (isSame(allServiceNames[j], allServices[i].serviceTitle)) {
+                if (platformList.includes(allServices[i]) == false)
+                    platformList.push(allServices[i]);
+            }
+        }
+    }
+    randomPlatformList = getRandomElements(platformList, 5)
+}
+else
+    servicesResponse = [];
+
+allServices.map((services:any)=>(
+    platformListTitles.push(services.serviceTitle.toLowerCase())
+));
+
+function getPaymentOptImgLink(paymentOpTitle:string) {
+    for (let i = 0; i < allPaymentOptions.length; i++) {
+        if(allPaymentOptions[i].paymentOptTitle.toLowerCase() === paymentOpTitle.toLowerCase())
+        return allPaymentOptions[i];
+    }
+}
+
+function isSame(APIService: string, platformSavedService: string) {
+    if (APIService.toLowerCase().includes(platformSavedService.toLowerCase()))
+        return true;
+}
+
+interface panelSchema {
+    id: string;
+    panelFeaturedImage: {
+        url: string;
+    };
+    panelAPIKey: string;
+    panelAPILink: string;
+    panelTitle: string;
+    panelWebsiteURL: string;
+    panelSlug: string;
+    panelTextDescription: string;
+    panelMetaDesc: string;
+    panelTotalServices: number;
+    rating: number;
+    ratingOtherSites: [{
+        score : string,
+        ratingURL :string,
+        ratingSite :string,
+        TotalReviews : string
+    }];
+    paymentOptions: [{
+        payDepo: string;
+        payOption: string;
+    }];
+}
+
+// Saving API services in Database
+// syncPanelServices(slug, servicesResponse);
+async function syncPanelServices(panelSlug : string , allServices : any[]) {
+    // 1. Generate the ID ONCE at the start
+    const syncId = `sync_${Date.now()}`; 
+    const chunkSize = 500; // Safe size to avoid Vercel's body size limit
+    const totalBatches = Math.ceil(allServices.length / chunkSize);
+
+    console.log(`Starting sync for ${panelSlug}. Total services: ${allServices.length}`);
+
+    for (let i = 0; i < allServices.length; i += chunkSize) {
+        
+        const batch = allServices.slice(i, i + chunkSize);
+        const currentBatchNum = (i / chunkSize) + 1;
+
+        try {
+            const response = await fetch(getAPIPath() + 'service_api', {
+                method: 'POST', 
+                headers : {
+                    'Content-Type': 'application/json',
+                    "origin" : "http://localhost:4321",
+                    "x-api-key" : import.meta.env.API_SECURITY_KEY
+                },
+                body: JSON.stringify({
+                    panelSlug,
+                    panelTitle : panel.panelTitle,
+                    panelRating : panel.rating,
+                    panelImage : panel.panelFeaturedImage,
+                    syncId, // Pass the same ID every time
+                    services: batch,
+                    isLastBatch: currentBatchNum === totalBatches // Optional flag
+                })
+            });
+
+            if (!response.ok) throw new Error(`Batch ${currentBatchNum} failed`);
+            
+            console.log(`Successfully synced batch ${currentBatchNum}/${totalBatches}`);
+        } catch (error) {
+            console.error("Sync interrupted:", error);
+            return; // Stop the loop if a batch fails
+        }
+    }
+    console.log("Sync Complete!");
+}
+---
+
+<MainLayoutNew 
+    lang={metaDataEs.language}
+    title={panel.panelTitle} 
+    metaDescription={panel.panelMetaDescriptionES} 
+    pageType="article"
+    pageFeaturedImage={getImageBasePath() + panel.panelFeaturedImage}>
+    <div class="content-wrapper w-full flex flex-wrap lg:flex-col lg:justify-start items-center justify-center gap-5 mt-20 my-6 px-5 text-white">
+        
+        <article class="flex flex-col gap-5 lg:max-w-[1260px] xl:max-w-[1400px] ">
+
+            <GlassLayout otherClass="p-4">
+                <div class="heading-section z-[1] w-full flex flex-col lg:flex-row gap-4">
+                    
+                    <span class="w-full lg:w-1/2 flex justify-center items-center flex-col gap-2">
+                        <img src={getImageBasePath() + panel.panelFeaturedImage}
+                            alt={panel.panelTitle + " Panel Image"}
+                            class="shadow-lg rounded-lg lg:h-[300px]" height="300px" width="100%" />
+                            <span class="flex gap-3 items-center justify-center text-center">
+                                <a target="_blank"
+                                    class="block rounded-lg p-3 bg-blue-600 hover:bg-blue-700 text-white"
+                                    href={panel.panelWebsiteURL}>{contentPath.text[30]} {panel.panelTitle}</a>
+                                
+                                <a target="_blank"
+                                    class="block rounded-lg p-3 bg-blue-600 hover:bg-blue-700 text-white"
+                                    href="/es/panels">{contentPath.text[31]}</a>
+                            </span>
+                        
+                    </span>
+
+                    <span class="w-full lg:w-1/2 flex justify-center items-center flex-col gap-4">
+                        <h1 class="text-4xl font-bold text-center">{panel.panelTitle}</h1>
+                        <span class="flex w-full gap-3 justify-between">
+                            {
+                                servicesResponse.length > 0 && 
+                                <GlassLayout otherClass="p-4 w-1/2" isTopMarginEnabled={false} isGlassDark={true}>
+                                    <h2 class="z-[1] text-center">
+                                        <span class="text-3xl font-semibold block">
+                                            {servicesResponse.length}
+                                        </span>
+                                        {contentPath.text[32]}
+                                    </h2>
+                                </GlassLayout>
+                            }
+                            {
+                                averagePrice > 0 &&
+                                <GlassLayout otherClass="p-4 w-1/2" isTopMarginEnabled={false} isGlassDark={true}>
+                                    <h2 class="z-[1] text-center">
+                                        <span class="text-3xl font-semibold block">
+                                            ${averagePrice.toFixed(2)}
+                                        </span>
+                                        {contentPath.text[33]}
+                                    </h2>
+                                </GlassLayout>
+                            }
+                        </span>
+
+                        {
+                            platformList.length > 0 &&
+                            <div class="socialsIcons flex">
+                                {
+                                    randomPlatformList.map((platform:any)=>(
+                                        <img class="rounded-full size-12 hover:brightness-75 -ml-4 bg-white border-2 border-white" src={getImageBasePath() + platform.serviceLogo} alt={`${platform.serviceTitle} logo`} title={platform.serviceTitle}/>
+                                    ))
+                                }
+                                <span onclick="toggleSocialModal();" class="cursor-pointer rounded-full flex hover:brightness-75 justify-center items-center size-12 -ml-4 bg-white border-2 border-black text-black">
+                                    {platformList.length - 7} <i class="fa-solid fa-plus"></i>
+                                </span>
+                            </div>
+                        }
+                        <!-- Rating -->
+                        <div class="reviewsBox flex gap-3 items-center rounded-md" title={`${panel.rating}/5`}>
+                            <h2 class="text-3xl font-semibold">{`${panel.rating} ${contentPath.text[34]} 5 ${contentPath.text[35]}`}</h2>
+                            <span class="flex gap-2 text-yellow-400 text-2xl">
+                                {
+                                    ratingCollection.map((rating) => (
+                                        <i class={rating.toString()} />
+                                    ))
+                                }
+                            </span>
+                        </div>
+                        <!-- Other Rating -->
+                        <div class="otherReviews-Container w-full flex lg:flex-row flex-col justify-center items-center gap-5">
+                
+                            {
+                                (panel.ratingOtherSites != null )  &&
+                                panel.ratingOtherSites.map((rating:any)=>(
+                                    rating.ratingURL != "" &&
+                                    (
+                                        <a target="_blank"href={rating.ratingURL} class="reviewsBox lg:w-[30%] text-[#0056b3] text-center md:w-1/2 w-full mb-4 flex flex-col items-center bg-white p-3 rounded-md shadow-md">
+                                            <img src={ "/assets/images/" + 
+                                                (rating.ratingSite == "TrustPilot" ? "trustpilotlogo.webp"
+                                                :
+                                                rating.ratingSite == "Sitejabber" ? "Sitejabber_logo.png"
+                                                :
+                                                "reviewsLogo.webp")
+                                            } alt={rating.ratingSite + " logo"} class="h-10 lg:w-[180px] w-full object-contain" />
+                                            <span class="flex gap-2 font-bold text-2xl">
+                                                {
+                                                    `${rating.score} / 5` 
+                                                }
+                                            </span>
+                                            <span class="block">{ `(${rating.TotalReviews} Reviews)` }</span>
+                                        </a>
+                                    )
+                                ))
+                            }
+                        </div>
+                    
+                    </span>
+                </div>
+            </GlassLayout>
+
+            <div class="article-wrapper flex lg:flex-row flex-col gap-4">
+                <!-- Search Description here -->
+                <div class="post-content lg:w-[60%] w-full flex flex-col gap-4">
+                    <p>{panel.panelMetaDescriptionES}</p>
+                    <!-- Payment Options -->
+                    <GlassLayout otherClass="mb-4" isTopMarginEnabled={false}>
+                        <div class="paymentOptions z-[1] w-full p-3 rounded-md shadow-md">
+                            <h2 class="text-3xl font-semibold">{contentPath.text[36]}</h2>
+    
+                            <div class="table w-full mt-4">
+                                <div class="header flex w-full p-2 gap-x-2 font-semibold bg-[#44444469] rounded-sm">
+                                    <div class="col w-[40%]">{contentPath.text[37]}</div>
+                                    <div class="col w-[25%]">{contentPath.text[38]}</div>
+                                    <div class="col w-[25%]">{contentPath.text[39]}</div>
+                                </div>
+                                {
+                                    panel.paymentOptions.map((paymentOp: any) => (
+                                        <div class="row flex w-full p-2 gap-x-2">
+                                            <div class="col w-[40%] flex gap-2">
+                                                {
+                                                    <a href={"/payment-options/"+paymentOp.payOption.toLowerCase().replaceAll(" ", "-").replaceAll("/", "-")}>
+                                                        <img height="30px" src={getImageBasePath() + getPaymentOptImgLink(paymentOp.payOption).paymentLogo} class="h-[30px] object-contain hover:scale-105 max-w-[50px]" alt={paymentOp.payOption} />
+                                                    </a>
+                                                }
+                                                {paymentOp.payOption}
+                                            </div>
+                                            <div class="col w-[25%]">
+                                                {paymentOp.payDepo}
+                                            </div>
+                                            <div class="col w-[25%]">
+                                                {paymentOp.payBonus || "-"}
+                                            </div>
+                                        </div>
+                                    ))
+                                }
+                            </div>
+                        </div>
+                    </GlassLayout>
+                </div>
+                
+                <div class="modal-container invisible fixed size-full top-0 left-0 z-10 flex justify-center items-center">
+                    
+                    <div class="modal-content rounded-lg backdrop-blur-sm bg-[#000000c7] size-[85%] flex justify-center items-center">
+                        <div class="closeBtn cursor-pointer fixed size-6 flex justify-center items-center -right-4 -top-4 bg-red-600 text-white rounded-full p-4">
+                            <i class="fa-solid fa-xmark"></i>
+                        </div>
+                        <div class="p-8 flex flex-col gap-4">
+                            <h2 class="text-3xl font-semibold">
+                                {panel.panelTitle} provides services for these platforms:
+                            </h2>
+                            <div class="services-cloud flex flex-wrap gap-3 lg:gap-5 text-white">
+                                {
+                                    platformList.length != 0 &&
+                                    platformList.map((service: any) => (
+                                        <a
+                                            href={
+                                                "/services/" +
+                                                service.serviceTitle
+                                                    .toLowerCase()
+                                                    .replaceAll(" ", "-")
+                                            }
+                                            class="lg:px-4 px-2 capitalize lg:py-2 py-1 lg:text-base text-[15px] rounded-md cursor-pointer hover:brightness-75 [text-shadow:_2px_-1px_2px_rgb(0_0_0_/_74%)]"
+                                            style={`background-color: ${service.serviceColor}`}
+                                        >
+                                            {service.serviceTitle}
+                                        </a>
+                                    ))
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <aside class="lg:w-[40%] w-full">
+                    
+                </aside>
+
+            </div>
+
+            {
+                servicesResponse.length != 0 && (typeof servicesResponse === 'string') == false && (
+                    <h2 class="text-3xl font-semibold">
+                        {contentPath.text[40]} {panel.panelTitle}
+                    </h2>
+                    <div class="services-table-holder shadow-2xl mb-4 mt-5 lg:w-full w-[89vw] overflow-auto">
+                        <div class="table-wrapper md:w-full w-[700px] ">
+                            <span class="offerHeader w-full flex bg-[#0056b3] font-semibold text-white ">
+                                <span class="offer_id my-6 w-[5%] pl-2">
+                                    {contentPath.text[41]}
+                                </span>
+                                <span class="offer_service my-6 w-[41%]">
+                                    {contentPath.text[42]}
+                                </span>
+                                <span class="offer_Minorder my-6 w-[18%]">
+                                    {contentPath.text[43]}
+                                </span>
+                                <span class="offer_Maxorder my-6 w-[18%]">
+                                    {contentPath.text[44]}
+                                </span>
+                                <span class="offer_rate my-6 w-[18%]">
+                                    {contentPath.text[45]}
+                                </span>
+                            </span>
+                            {
+                                
+                            servicesResponse.slice(0, 20)
+                                .map((service: any, j: number) => (
+                                    <span class="offerList w-full flex border-b border-gray-400">
+                                        <span class="offer_id line-clamp-1 my-3 w-[5%] pl-2">
+                                            {j + 1}
+                                        </span>
+                                        <span
+                                            class="offer_service line-clamp-1 my-3 w-[41%] text-left"
+                                            title={service.name}
+                                        >
+                                            {service.name}
+                                        </span>
+                                        <span class="offer_Minorder line-clamp-1 my-3 w-[18%]">
+                                            {service.min}
+                                        </span>
+                                        <span class="offer_Maxorder line-clamp-1 my-3 w-[18%]">
+                                            {service.max}
+                                        </span>
+                                        <span class="offer_rate line-clamp-1 my-3 w-[18%]">
+                                            ${service.rate}
+                                        </span>
+                                    </span>
+                                ))}
+                        </div>
+                    </div>
+                )
+            }
+            
+            <div class="post-content w-full flex flex-col gap-4">
+                <!-- Text Content to be shown here -->
+                <div class="content" set:html={makeWordsClickable(panel.panelTextDescriptionES, platformListTitles)}></div>
+            </div>
+            
+        </article>
+
+        {
+            allPanelsData2.length > 0 &&
+            <h2 class="text-3xl font-semibold">
+                {contentPath.text[46]}
+            </h2>
+            <div class="otherPanels flex justify-center items-center gap-5 lg:flex-row flex-col">
+                {
+                    allPanelsData2.slice(0, 3).map((panels) =>(
+                        <SMM_panelCardsBelow 
+                            lang = {metaDataEs.language}
+                            imageSrc={getImageBasePath() + panels.panelFeaturedImage}
+                            panelTitle = {panels.panelTitle}
+                            slugURL = {panels.panelSlug}
+                        />
+                ))
+            }
+            </div>
+        }
+    </div>
+</MainLayoutNew>
+
+
+<style is:inline>
+    .content h1{
+        font-size: 22px;
+        font-weight: 600;
+        padding-bottom: 15px;
+        padding-top: 10px;
+    }
+    .content h2{
+        font-size: 20px;
+        font-weight: 500;
+        padding-bottom: 15px;
+        padding-top: 10px;
+    }
+    .content h3{
+        font-size: 19px;
+        font-weight: 500;
+        padding-bottom: 15px;
+        padding-top: 10px;
+    }
+    .content h4{
+        font-size: 17px;
+        font-weight: 500;
+        padding-bottom: 15px;
+        padding-top: 10px;
+    }
+    .content h5{
+        font-size: 16px;
+        font-weight: 500;
+        padding-bottom: 15px;
+        padding-top: 10px;
+    }
+    .content h6{
+        font-size: 15px;
+        font-weight: 500;
+        padding-bottom: 15px;
+        padding-top: 10px;
+    }
+    .content ol{
+        list-style-type: decimal;
+        padding-left: 2rem;
+    }
+    .content p{
+        padding-bottom: 15px;
+        padding-top: 10px;
+    }
+
+    .content a{
+        color: #ff78ec;
+    }
+    .content a:hover{
+        text-decoration-line: underline;
+    }
+</style>
+
+<script is:inline define:vars={{ApiInfo : APIError}}>
+    if(ApiInfo)
+        console.log("API Error- ", ApiInfo);
+</script>
+
+<script is:inline>
+    var socialModalCloseBtn = document.querySelector(".closeBtn");
+    var socialModalContainer = document.querySelector(".modal-container");
+    
+    socialModalCloseBtn.addEventListener("click", ()=>{
+        toggleSocialModal();
+    })
+
+    function toggleSocialModal() {
+        socialModalContainer.classList.toggle("invisible");
+    }
+
+
+</script>

@@ -1,0 +1,61 @@
+---
+import { metaDataEs } from '../pages/es/data';
+import { metaDataPt } from '../pages/pt/data';
+import GlassLayout from './GlassLayout.astro'
+
+interface Props {
+    siteTitle : string
+    logoImgSrc :string,
+    lang ?:string
+}
+const {lang="en", logoImgSrc="", siteTitle} = Astro.props
+let langDirectory = "";
+if(lang != "en"){
+    langDirectory = "/"+ lang
+}
+let contentPath;
+if(lang == "es") contentPath = metaDataEs
+else if(lang == "pt") contentPath = metaDataPt
+
+const Links = [
+    { title: lang == "en" ? "About Us" :contentPath?.text[12] , url:`${langDirectory}/page/about` },
+    { title: lang == "en" ? "Privacy Policy" :contentPath?.text[13] , url:`${langDirectory}/page/privacy-policy` },
+    { title: lang == "en" ? "Disclaimer" :contentPath?.text[14],  url:`${langDirectory}/page/disclaimer` },
+    { title: lang == "en" ? "Contact Us" :contentPath?.text[15] , url:`${langDirectory}/page/contact-us` },
+]
+
+---
+
+<GlassLayout otherClass='m-4 p-4'>
+
+    <div class="bottom-content backdrop-blur-sm ">
+        
+        <div class="Footer-wrapper flex flex-col justify-center items-center">
+            <a href="/" class="logo">
+                <img src={logoImgSrc} class="h-20" alt="">
+            </a>
+        </div>
+
+        <footer class="w-full flex flex-col justify-center items-center text-white">
+
+            <nav class="">
+                <ul class="flex flex-wrap gap-x-5 gap-y-2 justify-center items-center">
+                    {
+                        Links.map((link)=>(
+                            <li class="cursor-pointer font-semibold hover:text-[#d3d8da]"><a href={link.url}>{link.title}</a></li>
+                        ))
+                    }
+                </ul>
+            </nav>
+
+            <div class="main-container">
+                <div class="wrapper w-full p-3">
+    
+                    <div class="bottom flex justify-center items-center">
+                        <span class="text-xs text-center">Copyright &copy; {siteTitle} {new Date().getFullYear()} | {lang == "en"? `All Rights reserved` : contentPath?.text[17]}</span>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+</GlassLayout>

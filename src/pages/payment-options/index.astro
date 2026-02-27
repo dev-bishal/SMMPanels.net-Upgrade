@@ -1,0 +1,50 @@
+---
+import GlassLayout from "../../components/GlassLayout.astro";
+import PaymentCard from "../../components/PaymentCard.astro";
+import { getAPIPath, getImageBasePath } from "../../data/utils";
+import MainLayoutNew from "../../layouts/MainLayoutNew.astro";
+
+interface paymentOptionStructure{
+    id: string,
+    paymentLogo: string,
+    paymentOptTitle: string,
+}
+const allPaymentOptions : paymentOptionStructure[] = await fetch(getAPIPath() + "payments").then(Response => Response.json());
+
+---
+
+<MainLayoutNew havePadding={true} title="List of Payment Options Supported by our Featured SMM Panels" metaDescription="">
+    
+    <!-- Hero Section -->
+    <GlassLayout otherClass='mt-20 my-6'>
+		<div class="wrapper z-[1] lg:w-[1100px] h-full py-10 px-5 lg:px-0 overflow-hidden">
+            <div class="hero-content flex flex-col lg:flex-row justify-center items-center h-full w-full">
+                <div data-aos="fade-right" data-aos-delay="2500"
+                    class="part lg:w-1/2 mt-10 lg:mt-0 h-full flex flex-col justify-center gap-5 text-white">
+                    <h2 class="font-semibold text-5xl">Payment Options supported by Top SMM Panels</h2>
+                    <p>Explore a comprehensive list of payment options accepted by leading SMM panels. From digital wallets to credit cards and cryptocurrency, discover flexible and secure ways to pay that suit your needs. Whether you're looking for quick, international, or hassle-free payment methods, find the best option for your marketing goals. Choose the panel with the perfect fit for your preferred payment solution and start growing your social media presence today!</p>
+                </div>
+                <div data-aos="fade-left" data-aos-delay="2500" class="part lg:w-1/2 h-full flex justify-center items-center">
+                    <img src="/assets/images/payment-option-hero-img2.png" class="h-full" alt={`Payment Option Header Image`}>
+                </div>
+            </div>
+        </div>
+	</GlassLayout>
+
+    <!-- Payment options Sections-->
+    <span class="flex w-full lg:justify-between lg:items-center gap-2 mb-3 flex-col lg:flex-row">
+        <h2 class="uppercase text-xl text-white font-bold">
+            List of Payment Methods supported by our listed SMM Panels-
+        </h2>
+    </span>
+    <section class="payment-options-container relative w-full flex flex-wrap gap-2 items-center" class:list={[
+        allPaymentOptions.length > 3 ? "justify-center" : "justify-start"
+    ]}>
+        {
+            allPaymentOptions.map((paymentOption : paymentOptionStructure)=>(
+                <PaymentCard img={getImageBasePath() + paymentOption.paymentLogo} panelsCount={12} title={paymentOption.paymentOptTitle} />
+            ))
+        }
+    </section>
+
+</MainLayoutNew>
