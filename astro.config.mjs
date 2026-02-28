@@ -10,6 +10,9 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   output: 'server',
   integrations: [sitemap()],
+  server: {
+    host: true // Or set this to '0.0.0.0'
+  },
   vite: {
     plugins: [tailwindcss()],
   },

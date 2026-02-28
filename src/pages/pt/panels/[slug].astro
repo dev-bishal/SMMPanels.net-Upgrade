@@ -390,7 +390,7 @@ interface panelSchema {
             
             <div class="post-content w-full flex flex-col gap-4">
                 <!-- Text Content to be shown here -->
-                <div class="content" set:html={makeWordsClickable(panel.panelTextDescriptionPT, platformListTitles)}></div>
+                <div class="content" set:html={makeWordsClickable(panel.panelTextDescriptionPT || "", platformListTitles)}></div>
             </div>
             
         </article>
