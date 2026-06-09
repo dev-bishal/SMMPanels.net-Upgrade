@@ -1,7 +1,7 @@
 ---
 import ButtonUI from "../../components/ButtonUI.astro";
 import GlassLayout from "../../components/GlassLayout.astro";
-import { getAPIPath, JsonToHtml } from "../../data/utils";
+import { getAPIPath, JsonToHtml, getImageBasePath } from "../../data/utils";
 import MainLayoutNew from "../../layouts/MainLayoutNew.astro";
 
 //Pages API for Contact Page Content Only
@@ -151,10 +151,10 @@ const allSettings = await fetch(getAPIPath() + "siteSettings/" + import.meta.env
 </style>
 
 <script is:inline define:vars={{ API: getAPIPath(),
-    emailReplySubject : allSettings.emailAutoReplyContent.emailSubject,
-    emailFrom : allSettings.emailAutoReplyContent.emailFrom,
-    emailContent : JsonToHtml({ time : 1610972762955, blocks: allSettings.emailAutoReplyContent.emailJs_Content}),
-    logoFileName : allSettings.siteLog
+    emailReplySubject : allSettings.emailData.emailSubject,
+    emailFrom : allSettings.emailData.emailFrom,
+    emailContent : JsonToHtml({ time : 1610972762955, blocks: allSettings.emailData.emailJs_Content}),
+    logoFileName : getImageBasePath() + allSettings.siteData.logoImage
  }}>
     const responseSection = document.querySelector(".responseMessage");
     // Function to handle the form submission

@@ -1,47 +1,455 @@
 ---
 import SearchFormNew from "../components/SearchFormNew.astro";
-import { getAPIPath } from "../data/utils";
+import { getAPIPath, getImageBasePath } from "../data/utils";
 import MainLayoutNew from "../layouts/MainLayoutNew.astro";
 
-const allSiteFetch:any = await fetch(getAPIPath() + "siteSettings/" + import.meta.env.SITESETTINGSKEY).then(Response => Response.json());
+const allSiteFetch:any = await fetch(getAPIPath() + "siteSettings/" + import.meta.env.SITESETTINGSKEY).then(Response =>
+Response.json());
 ---
 
-<MainLayoutNew title={` Search on ${allSiteFetch.SiteTitle}`} metaDescription=`Search among Best SMM Panels, and SMM Services Search on ${allSiteFetch.SiteTitle}`>
+<MainLayoutNew title={` Search on ${allSiteFetch.siteData.SiteTitle}`} metaDescription=`Search among Best SMM Panels, and SMM
+    Services Search on ${allSiteFetch.siteData.SiteTitle}`>
 
-    <div data-apiurl={getAPIPath()} class="content-wrapper text-white flex flex-wrap lg:justify-start justify-center gap-5 my-6 px-5 lg:mt-24 mt-20">
-        
-        <article class="flex flex-col gap-5 w-full">
+    <div class="content-wrapper flex flex-wrap lg:justify-start justify-center gap-5 my-6 px-5">
+
+        <article class="flex flex-col gap-5 w-full mt-10">
             <h1 class="searchResTitle text-2xl font-semibold"></h1>
-		    <div class="searchBox flex justify-center items-center">
-                <div class="wrapper lg:w-1/2 w-full">
-                    <SearchFormNew searchPagePath={"/search"}/>
+            <div class="searchBox flex justify-center items-center">
+                <div class="wrapper w-1/2">
+                    <SearchFormNew searchPagePath={"/search"} />
                 </div>
             </div>
-            
+
             <div class="searchResultsPanels hidden">
                 <h2 class="searchResTitle text-xl font-semibold">SMM Panels found:</h2>
-                <div id="panelsWrapper" class="panelsWrapper flex lg:justify-start md:justify-center items-center flex-wrap gap-4 my-5">
-                    
+                <div id="panelsWrapper"
+                    class="panelsWrapper flex lg:justify-start md:justify-center items-center flex-wrap gap-4 my-5">
+
                 </div>
             </div>
-            
+
             <div class="searchResultsServices hidden">
                 <h2 class="searchResTitle text-xl font-semibold">Services found:</h2>
-                <div id="servicesWrapper" class="panelsWrapper flex lg:justify-start md:justify-center items-center flex-wrap gap-4 my-5">
-                    
+                <div id="servicesWrapper"
+                    class="panelsWrapper flex lg:justify-start md:justify-center items-center flex-wrap gap-4 my-5">
+
                 </div>
             </div>
 
+            <section class="py-16">
+                <div class="container mx-auto px-4">
+                    <div class="text-center mb-12 fade-in">
+                        <h2 id="search-title" class="text-3xl md:text-4xl font-bold text-white mb-4">Find SMM-Panels
+                            and Various Services on SMM Search</h2>
+                    </div>
+
+                    <h2 id="panels-heading" class="text-3xl md:text-4xl font-bold text-white mb-4">SMM Panels Found
+                    </h2>
+                    <div id="panels-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <!-- Found SMM Panels will be dynamically loaded here -->
+                    </div>
+
+                    <h2 id="services-heading" class="text-3xl md:text-4xl font-bold text-white mt-12 mb-4">Social
+                        Media Platforms Found</h2>
+                    <div id="platforms-grid"
+                        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
+                        <!-- Platforms will be dynamically loaded here -->
+                    </div>
+                </div>
+            </section>
         </article>
-        
+
     </div>
 
-    <span class="hidden rounded-tl-lg rounded-tr-lg bg-[#81818169]"></span>
 </MainLayoutNew>
 
-<script is:inline src="/assets/scripts/search.js"></script>
-<script is:inline src="/assets/scripts/main.js"></script>
+<script is:inline define:vars={{APIUrl : getAPIPath(), ImagePath : getImageBasePath()}}>
+    // Search Page JavaScript
+    document.addEventListener('DOMContentLoaded', function () {
+        // Get API base URL (update this with your actual API URL)
+        // const APIUrl = 'https://your-api-url.com/api/'; // Replace with your API URL
 
-<script is:inline>
-    allowServiceCardClick("#servicesWrapper")
+        // Get search query from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchQuery = urlParams.get('q');
+
+        // DOM elements
+        const panelsContainer = document.querySelector('.grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-3.gap-8');
+        const platformsContainer = document.getElementById('platforms-grid');
+
+        // Update page title with search query
+        if (searchQuery) {
+            const searchTitle = document.querySelector('.text-center.mb-12.fade-in h2');
+            if (searchTitle) {
+                searchTitle.textContent = `Search Results for "${searchQuery}"`;
+            }
+        }
+
+        // Function to filter data by search query
+        function filterBySearch(data, searchField, query) {
+            if (!query) return data;
+
+            const searchTerm = query.toLowerCase().trim();
+            return data.filter(item => {
+                const fieldValue = item[searchField] || '';
+                // Also check other fields if you want broader search
+                const description = item.panelMetaDescription || item.panelTextDescription || '';
+                const tags = item.tags || [];
+
+                return (
+                    fieldValue.toLowerCase().includes(searchTerm) ||
+                    description.toLowerCase().includes(searchTerm) ||
+                    tags.some(tag => tag.toLowerCase().includes(searchTerm))
+                );
+            });
+        }
+
+        // Function to fetch and display panels
+        async function fetchAndDisplayPanels() {
+            if (!searchQuery) return;
+
+            try {
+                // Fetch ALL panels data (no search parameter)
+                const response = await fetch(`${APIUrl}panels`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const allPanels = await response.json();
+
+                // Filter panels client-side based on panelTitle
+                const filteredPanels = filterBySearch(allPanels, 'panelTitle', searchQuery);
+
+                // Clear existing content
+                if (panelsContainer) {
+                    panelsContainer.innerHTML = '';
+                }
+
+                // Display "No results" message if no panels found
+                const panelsHeading = document.querySelector('#panels-heading');
+                if (!filteredPanels || filteredPanels.length === 0) {
+                    if (panelsHeading) {
+                        panelsHeading.textContent = 'No SMM Panels Found';
+                    }
+                    if (panelsContainer) {
+                        panelsContainer.innerHTML = `
+                            <div class="col-span-full text-center py-8">
+                                <p class="text-white">No SMM panels found for "${searchQuery}"</p>
+                            </div>
+                        `;
+                    }
+                    return;
+                }
+
+                // Update heading with count
+                if (panelsHeading) {
+                    panelsHeading.textContent = `${filteredPanels.length} SMM Panels Found`;
+                }
+
+                // Create and append panel cards
+                filteredPanels.reverse().forEach(panel => {
+                    const panelCard = createPanelCard(panel);
+                    if (panelsContainer && panelCard) {
+                        panelsContainer.appendChild(panelCard);
+                    }
+                });
+
+            } catch (error) {
+                console.error('Error fetching panels:', error);
+                if (panelsContainer) {
+                    panelsContainer.innerHTML = `
+                        <div class="col-span-full text-center py-8">
+                            <p class="text-red-600">Error loading panels. Please try again later.</p>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // Function to create panel card element
+        function createPanelCard(panel) {
+            try {
+                // Generate star icons based on rating
+                const rating = parseFloat(panel.rating) || 0;
+                const stars = Math.floor(rating);
+                const starIcons = Array.from({ length: 5 }, (_, i) =>
+                    i < stars ? 'fas fa-star text-yellow-400' : 'far fa-star text-gray-300'
+                );
+
+                // Format date
+                const date = panel.updatedAt ? new Date(panel.updatedAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                }) : 'Recent';
+
+                // Create card element
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-xl shadow-lg overflow-hidden card-hover hover-lift';
+                card.innerHTML = `
+                    <!-- Image Section -->
+                    <div class="relative h-48 bg-gradient-to-r from-purple-400 to-purple-600 overflow-hidden">
+                        <img 
+                            src="${"/_image?href=" + ImagePath + panel.panelFeaturedImage + "&w=350&h=190&q=80&f=webp" || '/default-panel-image.jpg'}" 
+                            alt="${panel.panelTitle || 'SMM Panel'}"
+                            class="w-full h-full object-cover"
+                            onerror="this.src='/default-panel-image.jpg'"
+                        >
+                        <div class="absolute top-4 right-4 bg-purple-900/80 backdrop-blur-sm px-3 py-1 rounded-full text-sm text-white">
+                            <i class="fas fa-star rating-star"></i> ${rating.toFixed(1)}/5
+                        </div>
+                    </div>
+
+                    <div class="gradient-bg px-6 py-4 text-white">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-bold text-lg">${panel.panelTitle || 'Untitled Panel'}</h3>
+                        </div>
+                    </div>
+
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            ${starIcons.map(iconClass => `
+                                <i class="${iconClass} text-lg mr-1"></i>
+                            `).join('')}
+                            <span class="ml-2 text-gray-600">(${rating.toFixed(1)}/5)</span>
+                        </div>
+
+                        <p class="text-gray-600 mb-4 line-clamp-3">
+                            ${panel.panelMetaDescription || panel.panelTextDescription?.[0]?.dat?.content || 'No description available.'}
+                        </p>
+
+                        <div class="flex flex-wrap gap-2 mb-6">
+                            ${(panel.tags || []).slice(0, 4).map(tag => `
+                                <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">${tag}</span>
+                            `).join('')}
+                        </div>
+
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-500 text-sm"><i class="far fa-clock mr-1"></i> ${date}</span>
+                            <a href="/panels/${panel.panelSlug || panel._id}" class="text-purple-700 font-medium hover:text-purple-900 transition">
+                                Read Full Review <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                `;
+
+                return card;
+
+            } catch (error) {
+                console.error('Error creating panel card:', error);
+                return null;
+            }
+        }
+
+        // Function to fetch and display services
+        async function fetchAndDisplayServices() {
+            if (!searchQuery) return;
+
+            try {
+                // Fetch ALL services data (no search parameter)
+                const response = await fetch(`${APIUrl}services`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const allServices = await response.json();
+
+                // Filter services client-side based on serviceTitle
+                const filteredServices = filterBySearch(allServices, 'serviceTitle', searchQuery);
+
+                // Clear existing content
+                if (platformsContainer) {
+                    platformsContainer.innerHTML = '';
+                }
+
+                // Display "No results" message if no services found
+                const servicesHeading = document.querySelector('#services-heading');
+                if (!filteredServices || filteredServices.length === 0) {
+                    if (servicesHeading) {
+                        servicesHeading.textContent = 'No Social Media Platforms Found';
+                    }
+                    if (platformsContainer) {
+                        platformsContainer.innerHTML = `
+                            <div class="col-span-full text-center py-8">
+                                <p class="text-white">No social media platforms found for "${searchQuery}"</p>
+                            </div>
+                        `;
+                    }
+                    return;
+                }
+
+                // Update heading with count
+                if (servicesHeading) {
+                    servicesHeading.textContent = `${filteredServices.length} Social Media Platforms Found`;
+                }
+
+                // Create and append service cards
+                filteredServices.forEach((service, index) => {
+                    const serviceCard = createServiceCard(service, index);
+                    if (platformsContainer && serviceCard) {
+                        platformsContainer.appendChild(serviceCard);
+                    }
+                });
+
+            } catch (error) {
+                console.error('Error fetching services:', error);
+                if (platformsContainer) {
+                    platformsContainer.innerHTML = `
+                        <div class="col-span-full text-center py-8">
+                            <p class="text-red-600">Error loading services. Please try again later.</p>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // Function to create service card element
+        function createServiceCard(service, index) {
+            try {
+                // Helper function to get image path
+                function getImageBasePath() {
+                    return '/images/platforms/'; // Update this path as needed
+                }
+
+                const card = document.createElement('div');
+                card.className = 'platform-card bg-[#000000b9] text-white select-none cursor-pointer p-5 flex flex-col justify-center items-center gap-2 text-cente border border-transparent transition-all ease-in-out duration-200 active:scale-95 hover:bg-[#0000006b] shadow-2xl hover:shadow-gray-700 hover:border-gray-400';
+                card.style.animationDelay = `${index * 0.1}s`;
+                let popularity = parseInt((Math.random() * (1000 - 700) + 700).toString());
+                card.innerHTML = `
+                    <a href="/services/${(service.serviceTitle || '').toLowerCase()}"> 
+                        <img alt=${service.serviceTitle || 'Untitled Service'} class="rounded-full bg-white size-20 " src="${ImagePath + service.serviceLogo || 'default-service.png'}">
+                        <h2 class="font-semibold hover:underline">${service.serviceTitle || 'Untitled Service'}</h2> 
+                    </a>
+                    <span title="${popularity}">${popularity}+ Services</span>
+                `;
+
+                return card;
+
+            } catch (error) {
+                console.error('Error creating service card:', error);
+                return null;
+            }
+        }
+
+        // Add CSS for animations
+        function addSearchPageStyles() {
+            const style = document.createElement('style');
+            style.textContent = `
+                .fade-in {
+                    opacity: 0;
+                    animation: fadeIn 0.5s ease-out forwards;
+                }
+
+                @keyframes fadeIn {
+                    from {
+                        opacity: 0;
+                        transform: translateY(20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+
+                .hover-lift {
+                    transition: transform 0.3s ease, box-shadow 0.3s ease;
+                }
+
+                .hover-lift:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+                }
+
+                .card-hover {
+                    transition: all 0.3s ease;
+                }
+
+                .card-hover:hover {
+                    transform: translateY(-4px);
+                    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+                }
+
+                .gradient-bg {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                }
+
+                .line-clamp-2 {
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                }
+
+                .line-clamp-3 {
+                    display: -webkit-box;
+                    -webkit-line-clamp: 3;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                }
+
+                .rating-star {
+                    transition: color 0.3s ease;
+                }
+
+                .service-count {
+                    min-width: 60px;
+                    height: 30px;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    border-radius: 15px;
+                    font-weight: bold;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        // Initialize search page
+        function initializeSearchPage() {
+            addSearchPageStyles();
+
+            if (!searchQuery) {
+                // No search query provided
+                const noQueryMessage = `
+                    <div class="col-span-full text-center py-16">
+                        <div class="max-w-md mx-auto">
+                            <i class="fas fa-search text-5xl text-gray-400 mb-4"></i>
+                            <h3 class="text-2xl font-bold text-gray-800 mb-2">Search for SMM Panels & Services</h3>
+                            <p class="text-gray-600 mb-6">Enter a search term in the search bar to find SMM panels and social media services.</p>
+                            <a href="/" class="gradient-bg text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition">
+                                Go Back Home
+                            </a>
+                        </div>
+                    </div>
+                `;
+
+                if (panelsContainer) {
+                    panelsContainer.innerHTML = noQueryMessage;
+                }
+                if (platformsContainer) {
+                    platformsContainer.innerHTML = '';
+                }
+
+                // Update headings
+                const headings = document.querySelectorAll('h2.text-3xl');
+                headings.forEach(heading => {
+                    heading.textContent = 'Search Results';
+                });
+
+                return;
+            }
+
+            // Fetch both panels and services simultaneously
+            Promise.all([
+                fetchAndDisplayPanels(),
+                fetchAndDisplayServices()
+            ]).catch(error => {
+                console.error('Error in search initialization:', error);
+            });
+        }
+
+        // Start the search page
+        initializeSearchPage();
+    });
 </script>

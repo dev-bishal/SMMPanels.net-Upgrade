@@ -6,8 +6,9 @@ interface Props {
     siteTitle :string
     logoImgSrc :string,
     lang ?:string,
+    navData : any
 }
-const {logoImgSrc="", siteTitle} = Astro.props;
+const {logoImgSrc="", siteTitle, navData} = Astro.props;
 let {lang} = Astro.props;
 
 let langDirectory = "";
@@ -18,21 +19,6 @@ let contentPath;
 if(lang == "es") contentPath = metaDataEs
 else if(lang == "pt") contentPath = metaDataPt
 
-const Links = [
-    { title: lang=="en" ? "Home"  : contentPath?.text[0],               url:`${langDirectory}/` },
-    { title: lang=="en" ? "SMM Panels" : contentPath?.text[1] ,         url:`${langDirectory}/panels/` },
-    { title: lang=="en" ? "Payment Options" : contentPath?.text[2] ,    url:`${langDirectory}/payment-options/` },
-    { title: lang=="en" ? "Services"  : contentPath?.text[3],           url:`${langDirectory}/services/` }
-]
-
-const otherLinks = [
-    { 
-        title: "Login", 
-        url:"/admin", 
-        classes: "block bg-gradient-to-tr from-orange-500 to-yellow-400 font-semibold text-purple-900 rounded-full px-5 py-2 shadow-xl",
-        icon : `<i class="fa-solid fa-user-tie-hair"></i>`
-    },
-]
 ---
  <!-- header -->
  <header data-aos="fade-down" data-aos-delay="2500" class="w-full fixed lg:relative z-[4] text-white flex justify-center items-start">
@@ -46,8 +32,21 @@ const otherLinks = [
             <nav>
                 <ul class="flex gap-14">
                     {
-                        Links.map((link)=>(
-                            <li class="cursor-pointer font-semibold hover:text-[#d3d8da]"><a href={link.url}>{link.title}</a></li>
+                        lang == "en" &&
+                        navData.navLinks.map((link :any)=>(
+                            <li class="cursor-pointer font-semibold hover:text-[#d3d8da]"><a href={link.href}>{link.label}</a></li>
+                        ))
+                    }
+                    {
+                        lang == "es" &&
+                        navData.navLinksEs.map((link :any)=>(
+                            <li class="cursor-pointer font-semibold hover:text-[#d3d8da]"><a href={"/es" + link.href}>{link.label}</a></li>
+                        ))
+                    }
+                    {
+                        lang == "pt" &&
+                        navData.navLinksPt.map((link :any)=>(
+                            <li class="cursor-pointer font-semibold hover:text-[#d3d8da]"><a href={"/pt" + link.href}>{link.label}</a></li>
                         ))
                     }
                 </ul>
@@ -68,9 +67,9 @@ const otherLinks = [
                 </span>
                 <ul>
                     {
-                        otherLinks.map((link)=>(
-                            <li><a href={link.url} class={link.classes} set:html={link.icon}></a></li>
-                        ))
+                        navData.rightButtonTitle && 
+                        <li>
+                            <a href={navData.rightButtonLink} class="block bg-gradient-to-tr from-orange-500 to-yellow-400 font-semibold text-purple-900 rounded-full px-5 py-2 shadow-xl"><i class={navData.rightButtonClasses}></i></a></li>
                     }
                 </ul>
             </nav>
@@ -83,15 +82,28 @@ const otherLinks = [
         </a>
         <span
             class="navBarHamburger cursor-pointer text-2xl rounded-full w-10 h-10 flex justify-center items-center hover:bg-[rgba(0,0,0,0.21)]">
-            <i class="fa-solid fa-bars"></i>
-            <i class="fa-solid fa-xmark hidden"></i>
+            <span class="bars"><i class="fa-solid fa-bars"></i></span>
+            <span class="xmark hidden"><i class="fa-solid fa-xmark"></i></span>
         </span>
 
         <nav class="absolute w-full left-0 top-20 p-5 backdrop-blur-md bg-gradient-to-bl from-[#979797] to-[#000000f7] rounded-lg transition-all ease-in-out duration-300 -translate-y-[200%]">  <!-- backdrop-blur-md bg-gradient-to-bl from-orange-700 to-pink-800  -->
             <ul class="flex flex-col gap-4 pb-4">
                 {
-                    Links.map((link)=>(
-                        <li class="w-full"><a class="block w-full" href={link.url}>{link.title}</a></li>
+                    lang == "en" &&
+                    navData.navLinks.map((link :any)=>(
+                        <li class="w-full"><a class="block w-full" href={link.href}>{link.label}</a></li>
+                    ))
+                }
+                {
+                    lang == "es" &&
+                    navData.navLinksEs.map((link :any)=>(
+                        <li class="w-full"><a class="block w-full" href={"/es/" + link.href}>{link.label}</a></li>
+                    ))
+                }
+                {
+                    lang == "pt" &&
+                    navData.navLinksPt.map((link :any)=>(
+                        <li class="w-full"><a class="block w-full" href={"/pt/" + link.href}>{link.label}</a></li>
                     ))
                 }
             </ul>
@@ -110,9 +122,8 @@ const otherLinks = [
             </ul>
             <ul class="flex flex-col gap-4 pt-4">
                 {
-                    otherLinks.map((link)=>(
-                        <li class="w-full"><a href={link.url} class={link.classes} set:html={link.icon +" "+ link.title[0].toUpperCase() + link.title.substring(1, link.title.length)}></a></li>
-                    ))
+                    navData.rightButtonTitle && 
+                    <li class="w-full"><a href={navData.rightButtonLink} class="block bg-gradient-to-tr from-orange-500 to-yellow-400 font-semibold text-purple-900 rounded-full px-5 py-2 shadow-xl"><i class={navData.rightButtonClasses}></i> {navData.rightButtonTitle}</a></li>
                 }
                 
             </ul>
@@ -128,8 +139,8 @@ const mobileHamburgerBtn = document.querySelector(".navBarHamburger");
 const mobileNavBar = document.querySelector(".mobileHeaderwrapper nav");
 
 function TriggerNavBar() {
-    mobileHamburgerBtn.querySelector(".fa-bars").classList.toggle("hidden");
-    mobileHamburgerBtn.querySelector(".fa-xmark").classList.toggle("hidden");
+    mobileHamburgerBtn.querySelector(".bars").classList.toggle("hidden");
+    mobileHamburgerBtn.querySelector(".xmark").classList.toggle("hidden");
     mobileNavBar.classList.toggle("-translate-y-[200%]");
 }
 

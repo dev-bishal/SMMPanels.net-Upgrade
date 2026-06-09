@@ -47,7 +47,7 @@
         }
     }
 
-    function removeLink(id) {
+    function removeFooterLink(id) {
         footerLinks = footerLinks.filter(link => link.id !== id);
         renderFooterLinks();
     }
@@ -77,7 +77,7 @@
                             <span class="text-[10px] text-gray-400">${link.href}</span>
                         </div>
                     </div>
-                    <button type="button" onclick="removeLink('${link.id}')" class="text-gray-400 hover:text-red-500 text-xs">✕</button>
+                    <button type="button" onclick="removeFooterLink('${link.id}')" class="text-gray-400 hover:text-red-500 text-xs">✕</button>
                 `;
             list.appendChild(li);
         });

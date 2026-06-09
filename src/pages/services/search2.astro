@@ -1,218 +1,195 @@
 ---
-import GlassLayout from "../../components/GlassLayout.astro";
-import SearchFormNew from "../../components/SearchFormNew.astro";
-import { getAPIPath, getImageBasePath } from "../../data/utils";
-import MainLayoutNew from "../../layouts/MainLayoutNew.astro";
-const allSiteFetch: any = await fetch(getAPIPath() + "siteSettings/" + import.meta.env.SITESETTINGSKEY).then(
-(Response) => Response.json(),
-);
 
-const allPanelsFetch: any = await fetch(getAPIPath() + "panels").then(
-    (Response) => Response.json(),
-);
 ---
 
-<style is:inline>
-    /* Glassmorphism Core */
-    .glass-card {
-        background: rgba(255, 255, 255, 0.12);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border-radius: 2rem;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.25);
-    }
-    
-    .glass-input {
-        background: rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(6px);
-        border: 1px solid rgba(255,255,255,0.35);
-        transition: all 0.2s ease;
-    }
-    
-    .glass-input:focus {
-        background: rgba(255, 255, 255, 0.3);
-        border-color: rgba(255,255,255,0.7);
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(255,255,255,0.2);
-    }
-    
-    .glass-button {
-        background: rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(4px);
-        border: 1px solid rgba(255,255,255,0.4);
-        transition: all 0.2s ease;
-        cursor: pointer;
-    }
-    
-    .glass-button:hover:not(:disabled) {
-        background: rgba(255, 255, 255, 0.35);
-        transform: scale(0.97);
-    }
-    
-    .glass-button:disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
-    }
-    
-    .active-page {
-        background: rgba(255, 255, 255, 0.45);
-        border-color: white;
-        font-weight: 600;
-        backdrop-filter: blur(8px);
-    }
-    
-    /* Rating Stars */
-    .star-filled { color: #FFD966; }
-    .star-half { color: #FFD966; }
-    .star-empty { color: rgba(255,255,240,0.3); }
-    
-    /* Table horizontal scroll for mobile */
-    .table-wrapper {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: thin;
-        border-radius: 1.2rem;
-    }
-    
-    .custom-scroll::-webkit-scrollbar {
-        height: 6px;
-        width: 6px;
-    }
-    
-    .custom-scroll::-webkit-scrollbar-track {
-        background: rgba(255,255,255,0.2);
-        border-radius: 10px;
-    }
-    
-    .custom-scroll::-webkit-scrollbar-thumb {
-        background: rgba(255,255,255,0.5);
-        border-radius: 10px;
-    }
-    
-    body {
-        background: radial-gradient(circle at 20% 30%, rgba(15, 25, 45, 0.92), rgba(5, 10, 22, 0.96)), url('https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?q=80&w=2071&auto=format');
-        background-size: cover;
-        background-attachment: fixed;
-    }
-    
-    .service-table {
-        min-width: 900px;
-    }
-    
-    .service-table th, .service-table td {
-        padding: 1rem 1.2rem;
-        text-align: left;
-        border-bottom: 1px solid rgba(255,255,255,0.12);
-        vertical-align: middle;
-    }
-    
-    .service-table th {
-        font-weight: 600;
-        background: rgba(255,255,255,0.05);
-        cursor: pointer;
-        user-select: none;
-        transition: 0.2s;
-    }
-    
-    .service-table th:hover {
-        background: rgba(255,255,255,0.12);
-    }
-    
-    @media (max-width: 640px) {
-        .service-table th, .service-table td {
-            padding: 0.8rem 1rem;
-            font-size: 0.8rem;
-            white-space: nowrap;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>SMM Panel Services | Glassmorph Search</title>
+    <!-- Tailwind + Font Awesome + Google Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        
+        /* Glassmorphism Core */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.25);
         }
-        .glass-card { border-radius: 1.5rem; padding: 1rem; }
-    }
-    
-    .loading-spinner {
-        display: inline-block;
-        width: 28px;
-        height: 28px;
-        border: 3px solid rgba(255,255,255,0.3);
-        border-radius: 50%;
-        border-top-color: white;
-        animation: spin 0.8s linear infinite;
-    }
-    
-    @keyframes spin { to { transform: rotate(360deg); } }
-    
-    .panel-image {
-        width: 40px;
-        height: 40px;
-        object-fit: cover;
-        border-radius: 8px;
-        background: rgba(255,255,255,0.1);
-    }
-    
-    .badge-cancel {
-        background: rgba(220, 38, 38, 0.3);
-        color: #ff9999;
-        padding: 2px 8px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 500;
-    }
-    
-    .badge-dripfeed {
-        background: rgba(34, 197, 94, 0.3);
-        color: #86efac;
-        padding: 2px 8px;
-        border-radius: 20px;
-        font-size: 11px;
-    }
-</style>
+        
+        .glass-input {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(255,255,255,0.35);
+            transition: all 0.2s ease;
+        }
+        
+        .glass-input:focus {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255,255,255,0.7);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.2);
+        }
+        
+        .glass-button {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.4);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .glass-button:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.35);
+            transform: scale(0.97);
+        }
+        
+        .glass-button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        
+        .active-page {
+            background: rgba(255, 255, 255, 0.45);
+            border-color: white;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+        }
+        
+        /* Rating Stars */
+        .star-filled { color: #FFD966; }
+        .star-half { color: #FFD966; }
+        .star-empty { color: rgba(255,255,240,0.3); }
+        
+        /* Table horizontal scroll for mobile */
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            border-radius: 1.2rem;
+        }
+        
+        .custom-scroll::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+        
+        .custom-scroll::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+        }
+        
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.5);
+            border-radius: 10px;
+        }
+        
+        body {
+            background: radial-gradient(circle at 20% 30%, rgba(15, 25, 45, 0.92), rgba(5, 10, 22, 0.96)), url('https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?q=80&w=2071&auto=format');
+            background-size: cover;
+            background-attachment: fixed;
+        }
+        
+        .service-table {
+            min-width: 900px;
+        }
+        
+        .service-table th, .service-table td {
+            padding: 1rem 1.2rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.12);
+            vertical-align: middle;
+        }
+        
+        .service-table th {
+            font-weight: 600;
+            background: rgba(255,255,255,0.05);
+            cursor: pointer;
+            user-select: none;
+            transition: 0.2s;
+        }
+        
+        .service-table th:hover {
+            background: rgba(255,255,255,0.12);
+        }
+        
+        @media (max-width: 640px) {
+            .service-table th, .service-table td {
+                padding: 0.8rem 1rem;
+                font-size: 0.8rem;
+                white-space: nowrap;
+            }
+            .glass-card { border-radius: 1.5rem; padding: 1rem; }
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .panel-image {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .badge-cancel {
+            background: rgba(220, 38, 38, 0.3);
+            color: #ff9999;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        
+        .badge-dripfeed {
+            background: rgba(34, 197, 94, 0.3);
+            color: #86efac;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+        }
+    </style>
 
-<MainLayoutNew title={`Search Services on ${allSiteFetch.SiteTitle}`} metaDescription=`Search among Best SMM Panels, and SMM
-    Services on ${allSiteFetch.SiteTitle}`>
-
-    <div class="content-wrapper text-white flex flex-wrap lg:justify-start justify-center gap-5 my-6 px-5 lg:mt-24 mt-20">
-        <article class="flex flex-col gap-5 w-full">
-
-            <div class="text-center p-5 lg:w-full w-[89vw] overflow-auto z-[1]">
-                <h1 class="searchResTitle text-2xl font-semibold"></h1>
-            </div>
-            <div class="searchBox flex justify-center items-center">
-                <div class="wrapper lg:w-1/2 w-full">
-                    <SearchFormNew searchPagePath={"/services/search"} />
-                </div>
-            </div>
-
-            <div class="w-full max-w-[1400px] mx-auto">
+<div class="w-full max-w-[1400px] mx-auto">
     <div class="glass-card p-4 md:p-6 shadow-2xl transition-all">
         <!-- Header -->
         <div class="flex flex-wrap justify-between items-start gap-2 mb-4">
             <div>
                 <h1 class="text-2xl md:text-4xl font-bold text-white tracking-tight drop-shadow-md flex items-center gap-3">
                     <i class="fas fa-layer-group text-white/80"></i> 
-                    <span id="searchTerm"> Services</span>
+                    <span>SMM Panel Services</span>
                 </h1>
-                <p class="hidden text-white/70 text-sm mt-1">Real-time API with sorting, rating filter & pagination</p>
+                <p class="text-white/70 text-sm mt-1">Real-time API with sorting, rating filter & pagination</p>
             </div>
         </div>
 
         <!-- Filter & Search Controls -->
         <div class="flex flex-col md:flex-row gap-4 mb-6">
             <!-- Search Input (q parameter) -->
-            <div class="relative flex-1 hidden">
+            <div class="relative flex-1">
                 <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-white/60 text-sm"></i>
                 <input type="text" id="searchInput" placeholder="Search services (Instagram, Twitter, etc.)..." 
                        class="w-full pl-10 pr-4 py-3 rounded-xl glass-input text-white placeholder-white/50 focus:ring-0">
             </div>
             
-            <!-- Items per page dropdown - add this after the sorting dropdown -->
-            <div class="relative w-full md:w-36">
-                <select id="limitSelect" class="w-full appearance-none py-3 px-4 pr-10 rounded-xl glass-input text-white bg-white/20 backdrop-blur cursor-pointer">
-                    <option value="10" selected>10 per page</option>
-                    <option value="25">25 per page</option>
-                    <option value="50">50 per page</option>
-                </select>
-                <i class="fas fa-table-list absolute right-4 top-1/2 -translate-y-1/2 text-white/60 pointer-events-none"></i>
-            </div>
-
             <!-- Rating Filter Dropdown -->
             <div class="relative w-full md:w-56">
                 <select id="ratingFilter" class="w-full appearance-none py-3 px-4 pr-10 rounded-xl glass-input text-white bg-white/20 backdrop-blur cursor-pointer">
@@ -255,7 +232,7 @@ const allPanelsFetch: any = await fetch(getAPIPath() + "panels").then(
                         <th data-sort="max">Max <i class="fas fa-sort ml-1 opacity-60 text-xs"></i></th>
                         <th data-sort="rate">Rate ($) <i class="fas fa-sort ml-1 opacity-60 text-xs"></i></th>
                         <th data-sort="panelRating">Rating <i class="fas fa-sort ml-1 opacity-60 text-xs"></i></th>
-                        <th class="hidden">Avg Time (min)</th>
+                        <th>Avg Time (min)</th>
                         <th>Features</th>
                         <th>Category</th>
                         <th>Providing Panel</th>
@@ -276,22 +253,19 @@ const allPanelsFetch: any = await fetch(getAPIPath() + "panels").then(
         </div>
         
         <!-- API Info Note -->
-        <div class="mt-4 text-xs text-white/40 text-center border-t border-white/10 pt-3 hidden">
+        <div class="mt-4 text-xs text-white/40 text-center border-t border-white/10 pt-3">
             <i class="fas fa-database mr-1"></i> Connected to API: <span id="apiEndpointDisplay" class="font-mono">/api/smmpanels.net/service_api</span>
         </div>
     </div>
 </div>
 
-        </article>
-    </div>
-</MainLayoutNew>
-<script is:inline define:vars={{API_URL: getAPIPath(), IMAGE_PATH : getImageBasePath()}}>
+<script is:inline>
     // ========================
     // CONFIGURATION
     // ========================
     // Replace this with your actual API endpoint when available
     // The demo uses mock data that perfectly matches your API response structure
-    const API_BASE_URL = API_URL + "service_api"; // ← CHANGE TO REAL URL
+    const API_BASE_URL = "http://localhost:4322/api/smmpanels.net/service_api"; // ← CHANGE TO REAL URL
     
     // For demo purposes, we're using mock data that simulates the exact API response structure
     // When real API is available, simply set USE_MOCK = false and ensure CORS is handled
@@ -299,15 +273,13 @@ const allPanelsFetch: any = await fetch(getAPIPath() + "panels").then(
     
     // State variables
     let currentParams = {
-        q: getQueryParam(),
+        q: 'instagram',
         sortBy: 'min',
         order: 'asc',
         limit: 10,
         page: 1,
         rating: ''
     };
-
-    document.querySelector("#searchTerm").textContent = `Results for - '${getQueryParam()}'`;
     
     let currentStats = {
         totalRecords: 0,
@@ -329,13 +301,7 @@ const allPanelsFetch: any = await fetch(getAPIPath() + "panels").then(
     const paginationInfo = document.getElementById('paginationInfo');
     const paginationControls = document.getElementById('paginationControls');
     const apiEndpointDisplay = document.getElementById('apiEndpointDisplay');
-    const limitSelect = document.getElementById('limitSelect');
-
-    function getQueryParam() {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get('q') || '';
-    }
-
+    
     // Helper: Render Stars based on panelRating (1-5)
     function renderStars(rating) {
         const fullStars = Math.floor(rating);
@@ -496,7 +462,7 @@ const allPanelsFetch: any = await fetch(getAPIPath() + "panels").then(
                 <td class="font-mono text-sm">${formatNumber(service.max)}</td>
                 <td class="font-mono font-semibold">$${service.rate.toFixed(6)}</td>
                 <td>${renderStars(service.panelRating)}</td>
-                <td class="text-sm hidden">${service.average_time} min</td>
+                <td class="text-sm">${service.average_time} min</td>
                 <td>
                     ${service.cancel ? '<span class="badge-cancel inline-block mr-1"><i class="fas fa-ban mr-1"></i>Cancel</span>' : ''}
                     ${service.dripfeed ? '<span class="badge-dripfeed inline-block"><i class="fas fa-tint mr-1"></i>Dripfeed</span>' : ''}
@@ -505,9 +471,9 @@ const allPanelsFetch: any = await fetch(getAPIPath() + "panels").then(
                 <td class="text-sm max-w-[120px] truncate">${escapeHtml(service.category)}</td>
                 <td>
                     <div class="flex items-center gap-2">
-                        <img src="${IMAGE_PATH + service.panelImage}" alt="panel" class="panel-image w-[80px] h-[50px] rounded" >
+                        <img src="${service.panelImage}" alt="panel" class="panel-image" onerror="this.src='https://via.placeholder.com/40?text=No+Img'">
                         <div class="flex flex-col">
-                            <a href="/panels/${service.panelSlug}" target="_blank" rel="noopener noreferrer" class="text-white/90 hover:text-white underline text-sm font-medium">${escapeHtml(service.panelTitle)}</a>
+                            <a href="https://${service.panelSlug}" target="_blank" rel="noopener noreferrer" class="text-white/90 hover:text-white underline text-sm font-medium">${escapeHtml(service.panelTitle)}</a>
                             <span class="text-[10px] text-white/50">${escapeHtml(service.panelSlug)}</span>
                         </div>
                     </div>
@@ -592,28 +558,16 @@ const allPanelsFetch: any = await fetch(getAPIPath() + "panels").then(
             fetchServicesFromAPI();
         }, 400);
     }
-
-    function pageLimit(){
-        debugger
-        currentParams.limit = parseInt(limitSelect.value);
-        currentParams.page = 1; // Reset to first page when changing items per page
-        fetchServicesFromAPI();
-    }
     
     function resetAllFilters() {
         searchInput.value = 'instagram';
         ratingFilter.value = '';
         sortSelect.value = 'min';
-        
-        // Add this line to reset limit dropdown
-        const limitSelect = document.getElementById('limitSelect');
-        if (limitSelect) limitSelect.value = '25';
-        
         currentParams = {
             q: 'instagram',
             sortBy: 'min',
             order: 'asc',
-            limit: 25,  // ← Change to 25
+            limit: 10,
             page: 1,
             rating: ''
         };
@@ -636,8 +590,7 @@ const allPanelsFetch: any = await fetch(getAPIPath() + "panels").then(
         ratingFilter.addEventListener('change', applyFiltersAndReload);
         sortSelect.addEventListener('change', applyFiltersAndReload);
         resetBtn.addEventListener('click', resetAllFilters);
-        limitSelect.addEventListener('change', pageLimit);
-
+        
         // Column header sorting
         document.querySelectorAll('[data-sort]').forEach(header => {
             header.addEventListener('click', () => {
@@ -652,9 +605,6 @@ const allPanelsFetch: any = await fetch(getAPIPath() + "panels").then(
                 else if (sortKey === 'panelRating') {
                     sortSelect.value = sortSelect.value === 'panelRating' ? '-panelRating' : 'panelRating';
                     applyFiltersAndReload();
-                }
-                else if (limitSelect) {
-                    
                 }
             });
         });

@@ -50,7 +50,7 @@
         }
     }
 
-    function removeLink(id) {
+    function removeNavLink(id) {
         navLinks = navLinks.filter(link => link.id !== id);
         renderNavLinks();
     }
@@ -80,7 +80,7 @@
                             <span class="text-[10px] text-gray-400">${link.href}</span>
                         </div>
                     </div>
-                    <button type="button" onclick="removeLink('${link.id}')" class="text-gray-400 hover:text-red-500 text-xs">✕</button>
+                    <button type="button" onclick="removeNavLink('${link.id}')" class="text-gray-400 hover:text-red-500 text-xs">✕</button>
                 `;
             navlist.appendChild(li);
         });

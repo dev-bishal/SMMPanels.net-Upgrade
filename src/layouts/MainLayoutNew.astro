@@ -20,7 +20,7 @@ const allSiteFetch:any = await fetch(getAPIPath() + "siteSettings/" + import.met
 const {
     title, 
     lang = "en", 
-    metaDescription = allSiteFetch.siteMetaDescription,
+    metaDescription = allSiteFetch.siteData.SiteMetaDescription,
     havePadding = true,
     pageType = "website",
     pageFeaturedImage = "string"
@@ -33,10 +33,9 @@ const {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href={getImageBasePath() + allSiteFetch.siteFavicon} type="image/x-icon">
-    <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.5.1/css/all.css">
-    <title>{title} - {allSiteFetch.SiteTitle}</title>
-    <meta name="description" content={metaDescription}>
+    <link rel="shortcut icon" href={getImageBasePath() + allSiteFetch.siteData.faviconImage} type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <meta name="generator" content={Astro.generator} />
     <link rel="sitemap" href="/sitemap-index.xml" />
 
@@ -45,7 +44,7 @@ const {
       description={metaDescription}
       openGraph={{
         basic: {
-          title: `${title} - ${allSiteFetch.SiteTitle}`,
+          title: `${title} - ${allSiteFetch.siteData.SiteTitle}`,
           type: pageType,
           image: pageFeaturedImage,
         }
@@ -55,14 +54,14 @@ const {
       }}
       extend={{
         // extending the default link tags{allSiteFetch.siteFavicon}
-        link: [{ rel: "icon", href: getImageBasePath() + allSiteFetch.siteFavicon }],
+        link: [{ rel: "icon", href: getImageBasePath() + allSiteFetch.siteData.faviconImage }],
         // extending the default meta tags
         meta: [
           {
             name: "twitter:image",
             content: pageFeaturedImage,
           },
-          { name: "twitter:title", content: `${title} - ${allSiteFetch.SiteTitle}` },
+          { name: "twitter:title", content: `${title} - ${allSiteFetch.siteData.SiteTitle}` },
           { name: "twitter:description", content: metaDescription },
         ],
       }}
@@ -72,21 +71,21 @@ const {
 	  <script is:inline src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-element-bundle.min.js"></script>
 </head>
 <body>
-  <div class="bgContainer fixed top-0 left-0 bg-[url('/assets/images/background.webp')] bg-cover bg-no-repeat h-screen w-full overflow-hidden">
+  <div class="bgContainer fixed top-0 left-0 bg-cover bg-no-repeat h-screen w-full overflow-hidden" style=`background-image: url('${getImageBasePath() + allSiteFetch.siteData.SiteBGImage}');`>
     <div class="overlay z-0 absolute size-full bg-[#0000006f]"></div>
   </div>
     <div class="main-container">
         
         <div class="content-container h-full relative z-[1]">
-            <NavbarNew {lang} logoImgSrc={getImageBasePath() + allSiteFetch.siteLog} siteTitle={allSiteFetch.SiteTitle}/>
+            <NavbarNew {lang} logoImgSrc={getImageBasePath() + allSiteFetch.siteData.logoImage} siteTitle={allSiteFetch.siteData.SiteTitle} navData={allSiteFetch.navbarData}/>
 
-            <main class="w-full lg:min-h-[60vh] lg:overflow-x-hidden" class:list={[
+            <main class="w-full backdrop-blur-2xl lg:min-h-[60vh] lg:overflow-x-hidden" class:list={[
                 havePadding && "p-4"
             ]}>
                 <slot />
             </main>
 
-            <FooterNew {lang} logoImgSrc={getImageBasePath() + allSiteFetch.siteLog} siteTitle={allSiteFetch.SiteTitle}/>
+            <FooterNew {lang} logoImgSrc={getImageBasePath() + allSiteFetch.siteData.logoImage} siteTitle={allSiteFetch.siteData.SiteTitle}/>
         </div>
     </div>
 

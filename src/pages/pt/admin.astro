@@ -1,8 +1,0 @@
----
-import { getAPIPath } from "../../data/utils"
-
-const siteData = await fetch(getAPIPath() + "siteSettings/" + import.meta.env.SITESETTINGSKEY).then(Response => Response.json())
-let adminPath = siteData[0].adminPath
-return Astro.redirect(adminPath)
-
----

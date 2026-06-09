@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import { getLanguage, JsonToHtml, getImageBasePath, removeHTMLTags } from '../data/utils'
 interface Props {
     imageSrc : string,
@@ -23,16 +24,16 @@ if(lang != "en"){
 
 <article class="article-Schema lg:w-auto w-full relative z-[1] transition-all ease-in-out hover:scale-105 hover:shadow-xl flex justify-center items-center rounded-lg p-3 text-white">
     <div class="brightnessLow-overlay absolute z-0 bg-[#00000035] rounded-lg w-full h-full"></div>
-    <div class="content relative lg:w-auto w-full z-[1] flex flex-col lg:flex-row justify-center gap-3">
-        <img src={
-            imageSrc != ""
-            ? getImageBasePath() + imageSrc 
-            :"/assets/images/no-image-available.jpg"
-        }
-            class="rounded-lg lg:w-[15rem] lg:h-[9rem] object-cover hover:brightness-75" />
+        <div class="content relative lg:w-auto w-full z-[1] flex flex-col lg:flex-row justify-center gap-3">
+            <Image src={
+                imageSrc != ""
+                ? getImageBasePath() + imageSrc 
+                :"/assets/images/no-image-available.jpg"
+                } alt={panelTitle} width="400" height="225" class="rounded-lg lg:w-[15rem] w-full lg:h-[9rem] object-cover hover:brightness-75" />
+
         <span class="details">
             <a class="contents hover:text-blue-300" href={langDirectory + "/panels/"+ slugURL}><h3 class="w-fit cursor-pointer font-bold text-xl line-clamp-2">{panelTitle}</h3></a>
-            <span class="lg:block hidden description my-3 text-sm line-clamp-3" set:html={descriptionText.substring(0, 120) + "..."}></span>
+            <span class="lg:block hidden description my-3 text-sm line-clamp-3" set:html={descriptionText.length > 0 && descriptionText.substring(0, 120) + "..."}></span>
         </span>
     </div>
 </article>

@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import { metaDataEs } from '../pages/es/data';
 import { metaDataPt } from '../pages/pt/data';
 
@@ -46,14 +47,12 @@ else if(lang == "pt") contentPath = metaDataPt
 <article class="lg:w-[32%] md:w-[48%] overflow-hidden relative w-full rounded-lg shadow-sm hover:shadow-2xl hover:-translate-y-2 hover:scale-105 transition-all ease-in-out duration-150 group">
         
     <a class="relative flex justify-center items-center" href={langDirectory + "/panels/" + slugURL}>
-        <img src=
-        {
+        <Image src={
             imageSrc != ""
             ? imageSrc 
             :"/assets/images/no-image-available.jpg"
-        } 
-        alt={panelTitle + " thumbnail"} class="h-64 w-full rounded-lg">
-
+        } alt={panelTitle + " thumbnail"} width="450" height="260" class="h-64 w-full rounded-lg" />
+                        
     </a>
     
     <div class="data group-hover:translate-y-0 w-full rounded-b-lg text-white p-4 absolute translate-y-16 bg-[#00000069] backdrop-blur-sm bottom-0 left-0 transition-all ease-in-out duration-150">

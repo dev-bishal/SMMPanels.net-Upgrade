@@ -4,6 +4,8 @@ import PaymentCard from "../../components/PaymentCard.astro";
 import { getAPIPath, getImageBasePath } from "../../data/utils";
 import MainLayoutNew from "../../layouts/MainLayoutNew.astro";
 
+const allSiteFetch:any = await fetch(getAPIPath() + "siteSettings/" + import.meta.env.SITESETTINGSKEY).then(Response => Response.json());
+
 interface paymentOptionStructure{
     id: string,
     paymentLogo: string,
@@ -21,8 +23,8 @@ const allPaymentOptions : paymentOptionStructure[] = await fetch(getAPIPath() + 
             <div class="hero-content flex flex-col lg:flex-row justify-center items-center h-full w-full">
                 <div data-aos="fade-right" data-aos-delay="2500"
                     class="part lg:w-1/2 mt-10 lg:mt-0 h-full flex flex-col justify-center gap-5 text-white">
-                    <h2 class="font-semibold text-5xl">Payment Options supported by Top SMM Panels</h2>
-                    <p>Explore a comprehensive list of payment options accepted by leading SMM panels. From digital wallets to credit cards and cryptocurrency, discover flexible and secure ways to pay that suit your needs. Whether you're looking for quick, international, or hassle-free payment methods, find the best option for your marketing goals. Choose the panel with the perfect fit for your preferred payment solution and start growing your social media presence today!</p>
+                    <h2 class="font-semibold text-5xl">{allSiteFetch.paymentOptionPageData.paymentOptionHeaderText}</h2>
+                    <p>{allSiteFetch.paymentOptionPageData.paymentOptionSubText}</p>
                 </div>
                 <div data-aos="fade-left" data-aos-delay="2500" class="part lg:w-1/2 h-full flex justify-center items-center">
                     <img src="/assets/images/payment-option-hero-img2.png" class="h-full" alt={`Payment Option Header Image`}>

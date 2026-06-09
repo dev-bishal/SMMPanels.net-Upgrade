@@ -1,7 +1,9 @@
 ---
+import { getAPIPath } from '../data/utils';
 import { metaDataEs } from '../pages/es/data';
 import { metaDataPt } from '../pages/pt/data';
 import GlassLayout from './GlassLayout.astro'
+
 
 interface Props {
     siteTitle : string
@@ -24,6 +26,12 @@ const Links = [
     { title: lang == "en" ? "Contact Us" :contentPath?.text[15] , url:`${langDirectory}/page/contact` },
 ]
 
+const allSiteFetch:any = await fetch(getAPIPath() + "siteSettings/" + import.meta.env.SITESETTINGSKEY).then(Response => Response.json());
+
+let footerTextBasedOnLang;
+if(lang == "es") footerTextBasedOnLang = allSiteFetch.footerData.footerTextEs;
+else if(lang == "pt") footerTextBasedOnLang = allSiteFetch.footerData.footerTextPt;
+else footerTextBasedOnLang = allSiteFetch.footerData.footerCopyrightText;
 ---
 
 <GlassLayout otherClass='m-4 p-4'>
@@ -52,7 +60,7 @@ const Links = [
                 <div class="wrapper w-full p-3">
     
                     <div class="bottom flex justify-center items-center">
-                        <span class="text-xs text-center">Copyright &copy; {siteTitle} {new Date().getFullYear()} | {lang == "en"? `All Rights reserved` : contentPath?.text[17]}</span>
+                        <span class="text-xs text-center">Copyright &copy; {siteTitle} {new Date().getFullYear()} | {footerTextBasedOnLang}</span>
                     </div>
                 </div>
             </div>

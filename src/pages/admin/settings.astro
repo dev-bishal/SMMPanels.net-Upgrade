@@ -1,7 +1,11 @@
 ---
+import LinksFooterGenerator from "../../admin-components/LinksFooterGenerator.astro";
+import LinksSocialGenerator from "../../admin-components/LinksSocialGenerator.astro";
+import LinksNavbarGenerator from "../../admin-components/LinksNavbarGenerator.astro";
 import { isAdminLoggedIn } from "../../data/admin-utils";
 import { getAPIPath, getImageBasePath} from "../../data/utils";
 import AdminLayout from "../../layouts/AdminLayout.astro";
+
 
 const adminCookie = Astro.cookies.get("admin");
 
@@ -121,12 +125,24 @@ if(response.status !== 200 && response.isValid !== true){
                             <i class="fas fa-cog mr-3"></i> General Settings
                         </button>
                         <button class="tab-button w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100"
+                            data-tab="pageSettings">
+                            <i class="fas fa-shopping-cart mr-3"></i> Page Settings
+                        </button>
+                        <button class="tab-button w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100"
                             data-tab="email">
                             <i class="fas fa-envelope mr-3"></i> Email Settings
                         </button>
                         <button class="tab-button w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100"
+                            data-tab="header">
+                            <i class="fa-solid fa-border-top-left mr-3"></i>  Navbar Settings
+                        </button>
+                        <button class="tab-button w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100"
+                            data-tab="footer">
+                            <i class="fa-solid fa-border-top-left mr-3 rotate-180"></i>  Footer Settings
+                        </button>
+                        <button class="tab-button w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100"
                             data-tab="ads">
-                            <i class="fa-solid fa-image-stack mr-3"></i>  Placing Ad Units
+                            <i class="fa-brands fa-adversal mr-3"></i>  Placing Ad Units
                         </button>
                     </nav>
                 </div>
@@ -136,8 +152,8 @@ if(response.status !== 200 && response.isValid !== true){
             <div class="lg:col-span-3">
                 <form id="settings-form">
                     <!-- General Settings -->
-                    <div id="general" class="tab-content active">
-                        <div class="hover:-translate-y-0.5 hover:shadow-sm bg-white rounded-xl shadow-sm p-6 settings-section">
+                    <div id="general" class="tab-content hover:-translate-y-0.5 hover:shadow-sm active">
+                        <div class="bg-white rounded-xl shadow-sm p-6 settings-section">
                             <h2 class="text-xl font-semibold text-gray-800 mb-6">General Settings</h2>
                             
                             <div class="grid grid-cols-1 gap-6">
@@ -162,79 +178,172 @@ if(response.status !== 200 && response.isValid !== true){
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 placeholder="http://128.140.35.62:4322/webhook2">
                             </div>
-                           
-                        </div>
-
-                        <div class="hover:-translate-y-0.5 hover:shadow-sm bg-white mt-10 rounded-xl shadow-sm p-6">
-                            <h2 class="text-xl font-semibold text-gray-800 mb-6">Page Settings</h2>
                             
-                            <div class="space-y-6">
-                                
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label class="block text-gray-700 text-sm font-medium mb-2">Number of Panels to show in Home Page</label>
-                                        <input type="number" name="siteHomePanelCount" id="siteHomePanelCount"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                        placeholder="10" step="1">
-                                    </div>
-                                    <div>
-                                        <label class="block text-gray-700 text-sm font-medium mb-2">Number of Panels to be shown in Pagination</label>
-                                        <input type="number" name="sitePanelCount" id="sitePanelCount"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                        placeholder="25" step="1">
-                                    </div>
+                            <div class="flex items-center justify-between mt-6">
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-medium mb-1">Is New Admin Allowed</label>
+                                    <p class="text-gray-500 text-sm">Turning the toggle on will allow signing-up accounts on Login page</p>
                                 </div>
-                                
+                                <label class="inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="newAdminToggle" id="newAdminToggle" class="toggle-checkbox sr-only">
+                                    <span class="toggle-label relative w-12 h-6 bg-gray-200 rounded-full transition-colors">
+                                        <span class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform"></span>
+                                    </span>
+                                </label>
                             </div>
-                        </div>
 
-                        <div class="hover:-translate-y-0.5 hover:shadow-sm bg-white mt-10 rounded-xl shadow-sm p-6 settings-section">
-                            <h2 class="text-xl font-semibold text-gray-800 mb-6">Setup your Header/Navbar layout</h2>
+                            <!-- Site Image -->
+                            <div class="bg-gray-50 p-4 rounded-lg mt-6">
+                                <h3 class="text-lg font-medium text-gray-900 mb-4">Site Background Image</h3>
+                                
+                                <div
+                                    class="image-upload-container border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-[#3b82f6]">
+                                    <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                                    <p class="text-sm text-gray-600">Click to upload or drag and drop</p>
+                                    <p class="text-xs text-gray-500">SVG, PNG, JPG or GIF (max. 5MB)</p>
+                                    <input type="file" class="hidden" id="site-bg-image-upload" name="Site image">
+                                </div>
                             
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                                <!-- Site Logo Image -->
-                                <div class="bg-gray-50 p-4 rounded-lg">
-                                    <h3 class="text-lg font-medium text-gray-900 mb-4">Site Logo Image</h3>
-                                    
-                                    <div
-                                    class="image-upload-container border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-[#3b82f6]">
-                                    <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
-                                    <p class="text-sm text-gray-600">Click to upload or drag and drop</p>
-                                    <p class="text-xs text-gray-500">SVG, PNG, JPG or GIF (max. 5MB)</p>
-                                    <input type="file" class="hidden" id="site-logo-image-upload" name="logoImage">
-                                </div>
-                                
-                                <div id="logo-image-preview" class="hidden mt-4">
-                                    <img src="" alt="Site Logo image preview" class="rounded-lg max-h-48 mx-auto">
-                                        <button type="button" class="mt-2 text-red-600 text-sm">
-                                            <i class="fas fa-trash mr-1"></i> Remove image
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <!-- Site Favicon Image -->
-                                <div class="bg-gray-50 p-4 rounded-lg">
-                                    <h3 class="text-lg font-medium text-gray-900 mb-4">Site Favicon Image</h3>
-                                    
-                                    <div
-                                    class="image-upload-container border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-[#3b82f6]">
-                                    <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
-                                    <p class="text-sm text-gray-600">Click to upload or drag and drop</p>
-                                    <p class="text-xs text-gray-500">SVG, PNG, JPG or GIF (max. 5MB)</p>
-                                    <input type="file" class="hidden" id="site-favicon-image-upload" name="faviconImage">
-                                </div>
-                                
-                                <div id="favicon-image-preview" class="hidden mt-4">
-                                    <img src="" alt="Site Favicon image preview" class="rounded-lg max-h-48 mx-auto">
-                                        <button type="button" class="mt-2 text-red-600 text-sm">
-                                            <i class="fas fa-trash mr-1"></i> Remove image
-                                        </button>
-                                    </div>
+                                <div id="site-bg-image-preview" class="hidden mt-4">
+                                    <img src="" alt="Site image preview" class="rounded-lg max-h-48 mx-auto">
+                                    <button type="button" class="mt-2 text-red-600 text-sm">
+                                        <i class="fas fa-trash mr-1"></i> Remove image
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
+                    <!-- Page Settings -->
+                    <div id="pageSettings" class="tab-content">
+                        <div class="settings-section">
+                            <div class="bg-white rounded-xl shadow-sm p-6 hover:-translate-y-0.5 hover:shadow-sm">
+                                <h2 class="text-xl font-semibold text-gray-800 mb-6">Page Settings</h2>
+                                
+                                <div class="space-y-6">
+                                    
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label class="block text-gray-700 text-sm font-medium mb-2">Number of Panels to show in Home Page</label>
+                                            <input type="number" name="siteHomePanelCount" id="siteHomePanelCount"
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            placeholder="10" step="1">
+                                        </div>
+                                        <div>
+                                            <label class="block text-gray-700 text-sm font-medium mb-2">Number of Panels to be shown in Pagination</label>
+                                            <input type="number" name="sitePanelCount" id="sitePanelCount"
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            placeholder="25" step="1">
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+
+                            <div class="bg-white rounded-xl shadow-sm p-6 mt-6 hover:-translate-y-0.5 hover:shadow-sm">
+                                <h2 class="text-xl font-semibold text-gray-800 mb-6">Homepage Settings</h2>
+
+                                <!-- Homepage Image -->
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <h3 class="text-lg font-medium text-gray-900 mb-4">Homepage Image</h3>
+
+                                    <div
+                                        class="image-upload-container border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-[#3b82f6]">
+                                        <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                                        <p class="text-sm text-gray-600">Click to upload or drag and drop</p>
+                                        <p class="text-xs text-gray-500">SVG, PNG, JPG or GIF (max. 5MB)</p>
+                                        <input type="file" class="hidden" id="homepage-image-upload" name="Homepage image">
+                                    </div>
+                                
+                                    <div id="homepage-image-preview" class="hidden mt-4">
+                                        <img src="" alt="Homepage image preview" class="rounded-lg max-h-48 mx-auto">
+                                        <button type="button" class="mt-2 text-red-600 text-sm">
+                                            <i class="fas fa-trash mr-1"></i> Remove image
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-6">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">Home Page Head Title</label>
+                                    
+                                    <input type="text" name="homeHeaderTitle" id="homeHeaderTitle"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="My SMM Panel Review Site...">
+                                </div>
+
+                                <div class="mt-6">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">Home Page Sub-Title</label>
+                                    <textarea name="homeHeaderParagraph" id="homeHeaderParagraph"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    rows="3" placeholder="We offer the best reviews on available SMM Panels around the globe..."></textarea>
+                                </div>
+
+                                <div class="mt-6">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">HomePage Title (Above Panels Listing)</label>
+                                    <input type="text" name="homePagePanelHeaderText" id="homePagePanelHeaderText" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Recently Added Panels...">
+                                </div>
+
+                                <div class="mt-6">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">HomePage Sub-Title (Above Panels Listing)</label>
+                                    <input type="text" name="homePagePanelSubText" id="homePagePanelSubText" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Checkout the latest reviews on SMM Panels...">
+                                </div>
+
+                                <div class="mt-6">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">HomePage link to Panel Button Text</label>
+                                    <input type="text" name="homePagePanelButtonText" id="homePagePanelButtonText" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="View All Reviews...">
+                                </div>
+                                
+                            </div>
+
+                            <div class="bg-white rounded-xl shadow-sm p-6 mt-6 hover:-translate-y-0.5 hover:shadow-sm">
+                                <h2 class="text-xl font-semibold text-gray-800 mb-6">Panels and Pagination page Settings</h2>
+                                <div class="mt-6">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">Panel Pagination Title (Above Panels Listing)</label>
+                                    <input type="text" name="panelPagePanelHeaderText" id="panelPagePanelHeaderText" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Recently Published Reviews on SMM Panels...">
+                                </div>
+
+                                <div class="mt-6">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">Panel Pagination Sub-Title (Above Panels Listing)</label>
+                                    <input type="text" name="panelPagePanelSubText" id="panelPagePanelSubText" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Latest expert reviews of SMM panels...">
+                                </div>
+
+                                <div class="mt-6">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">Open Panel Article Button Text</label>
+                                    <input type="text" name="panelPageReadMoreBtntext" id="panelPageReadMoreBtntext" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Read about this Panel...">
+                                </div>
+                            </div>
+
+                            <div class="bg-white rounded-xl shadow-sm p-6 mt-6 hover:-translate-y-0.5 hover:shadow-sm">
+                                <h2 class="text-xl font-semibold text-gray-800 mb-6">Services page Settings</h2>
+                                
+                                <div class="mt-6">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">Service Pagination Title (Above Service Listing)</label>
+                                    <input type="text" name="servicePagePanelHeaderText" id="servicePagePanelHeaderText" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Best Social Media Platforms...">
+                                </div>
+
+                                <div class="mt-6">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">Service Pagination Sub-Title (Above Service Listing)</label>
+                                    <input type="text" name="servicePagePanelSubText" id="servicePagePanelSubText" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Explore all social media platforms...">
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white rounded-xl shadow-sm p-6 mt-6 hover:-translate-y-0.5 hover:shadow-sm">
+                                <h2 class="text-xl font-semibold text-gray-800 mb-6">Payment Option page Settings</h2>
+                                
+                                <div class="mt-6">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">All Payment Option Listing Page Title (Header Title)</label>
+                                    <input type="text" name="paymentOptionHeaderText" id="paymentOptionHeaderText" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Best Social Media Platforms...">
+                                </div>
+
+                                <div class="mt-6">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">All Payment Option Listing Page Sub-Title (Header Subtitle)</label>
+                                    <input type="text" name="paymentOptionSubText" id="paymentOptionSubText" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Explore all social media platforms...">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
                     <!-- Email Settings -->
                     <div id="email" class="tab-content hover:-translate-y-0.5 hover:shadow-sm">
                         <div class="bg-white rounded-xl shadow-sm p-6 settings-section">
@@ -262,6 +371,106 @@ if(response.status !== 200 && response.isValid !== true){
                                     <div id="editorjs" class="editor-container"></div>
                                 </div>
                                 
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navbar/Header Settings -->
+                    <div id="header" class="tab-content hover:-translate-y-0.5 hover:shadow-sm">
+                        <div class="bg-white rounded-xl shadow-sm p-6 settings-section">
+                            <h2 class="text-xl font-semibold text-gray-800 mb-6">Setup your Header/Navbar layout</h2>
+                            
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                                <!-- Site Logo Image -->
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <h3 class="text-lg font-medium text-gray-900 mb-4">Site Logo Image</h3>
+                                    
+                                    <div
+                                        class="image-upload-container border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-[#3b82f6]">
+                                        <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                                        <p class="text-sm text-gray-600">Click to upload or drag and drop</p>
+                                        <p class="text-xs text-gray-500">SVG, PNG, JPG or GIF (max. 5MB)</p>
+                                        <input type="file" class="hidden" id="site-logo-image-upload" name="logoImage">
+                                    </div>
+                                
+                                    <div id="logo-image-preview" class="hidden mt-4">
+                                        <img src="" alt="Site Logo image preview" class="rounded-lg max-h-48 mx-auto">
+                                        <button type="button" class="mt-2 text-red-600 text-sm">
+                                            <i class="fas fa-trash mr-1"></i> Remove image
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Site Favicon Image -->
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <h3 class="text-lg font-medium text-gray-900 mb-4">Site Favicon Image</h3>
+                                    
+                                    <div
+                                    class="image-upload-container border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-[#3b82f6]">
+                                    <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                                    <p class="text-sm text-gray-600">Click to upload or drag and drop</p>
+                                    <p class="text-xs text-gray-500">SVG, PNG, JPG or GIF (max. 5MB)</p>
+                                    <input type="file" class="hidden" id="site-favicon-image-upload" name="faviconImage">
+                                </div>
+                                
+                                <div id="favicon-image-preview" class="hidden mt-4">
+                                    <img src="" alt="Site Favicon image preview" class="rounded-lg max-h-48 mx-auto">
+                                        <button type="button" class="mt-2 text-red-600 text-sm">
+                                            <i class="fas fa-trash mr-1"></i> Remove image
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6">
+                                <LinksNavbarGenerator />
+                            </div>
+
+                            <!-- Right Side Button -->
+                            <div class="space-y-3 mt-6">
+                                <h3 class="text-lg font-medium text-gray-900 mb-4">Right Side Button</h3>
+
+                                <input type="text" name="rightButtonTitle" id="rightButtonTitle" placeholder="Link Label" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#3b82f6] outline-none">
+                                <input type="text" name="rightButtonClasses" id="rightButtonClasses" placeholder="Link Icon class" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#3b82f6] outline-none">
+                                <input type="text" name="rightButtonLink" id="rightButtonLink" placeholder="URL" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#3b82f6] outline-none">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Footer Settings -->
+                    <div id="footer" class="tab-content hover:-translate-y-0.5 hover:shadow-sm">
+                        <div class="bg-white rounded-xl shadow-sm p-6 settings-section">
+                            <h2 class="text-xl font-semibold text-gray-800 mb-6">Setup your footer layout</h2>
+                            <div class="space-y-6">
+
+                                <div class="mt-6">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">Footer Note/Paragraph</label>
+                                    <textarea name="footerText" id="footerText"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        rows="3" placeholder="We offer the best products with excellent customer service and fast shipping."></textarea>
+                                </div>
+
+                                <div class="mt-6">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">For 3rd Column Content</label>
+                                    <div id="editorjsFooter" class="editor-container"></div>
+                                </div>
+                                
+                                <div class="mt-6">
+                                    <LinksFooterGenerator />
+                                </div>
+                                
+                                <div class="mt-6">
+                                    <LinksSocialGenerator />
+                                </div>
+                                
+                                <div class="mt-6">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">Footer Copyright Text</label>
+                                    <textarea name="footerCopyrightText" id="footerCopyrightText"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        rows="3" placeholder="&copy 202_. All rights reserved"></textarea>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -381,6 +590,57 @@ if(response.status !== 200 && response.isValid !== true){
 
             });
             
+            // Footer Initialize Editor.js
+            editorFooter = new EditorJS({
+                holder: 'editorjsFooter',
+                tools: {
+                    header: {
+                        class: Header,
+                        config: {
+                            placeholder: 'Enter a header',
+                            levels: [1, 2, 3, 4],
+                            defaultLevel: 2
+                        }
+                    },
+                    List: {
+                        class: EditorjsList,
+                        inlineToolbar: true,
+                        config: {
+                            defaultStyle: 'unordered'
+                        },
+                    },
+                    embed: {
+                        class: Embed,
+                        config: {
+                            services: {
+                                youtube: true,
+                                coub: true
+                            }
+                        }
+                    },
+                    quote: {
+                        class: Quote,
+                        inlineToolbar: true,
+                        config: {
+                            quotePlaceholder: 'Enter a quote',
+                            captionPlaceholder: 'Quote\'s author',
+                        },
+                    },
+                    marker: {
+                        class: Marker,
+                        shortcut: 'CMD+SHIFT+M',
+                    },
+                    delimiter: {
+                        class: Delimiter,
+                    },
+                    raw: {
+                        class : RawTool
+                    },
+                },
+                placeholder: 'Use Raw HTML Code or leave it blank if you want nothing to be display...',
+                autofocus: true,
+
+            });
         });
 
         // Get DOM elements
@@ -394,6 +654,18 @@ if(response.status !== 200 && response.isValid !== true){
         const faviconPreviewImg = faviconPreview.querySelector('img');
         const logoRemoveBtn = logoPreview.querySelector('button');
         const faviconRemoveBtn = faviconPreview.querySelector('button');
+        
+        const siteBgUpload = document.getElementById('site-bg-image-upload');
+        const siteBgPreview = document.getElementById('site-bg-image-preview');
+        const siteBgPreviewImg = siteBgPreview.querySelector('img');
+        const siteBgPreviewUploadContainer = document.querySelector('#site-bg-image-upload').closest('.image-upload-container');
+        const siteBgRemoveBtn = siteBgPreview.querySelector('button');
+        
+        const homeImgUpload = document.getElementById('homepage-image-upload');
+        const homeImgPreview = document.getElementById('homepage-image-preview');
+        const homeImgPreviewImg = homeImgPreview.querySelector('img');
+        const homeImgPreviewUploadContainer = document.querySelector('#homepage-image-upload').closest('.image-upload-container');
+        const homeImgRemoveBtn = homeImgPreview.querySelector('button');
 
         let LOGObase64String;
         let LOGOfileType;
@@ -402,14 +674,22 @@ if(response.status !== 200 && response.isValid !== true){
         let FAVICONbase64String;
         let FAVICONfileType;
         let FAVICONisImageRemoved = false;
+        
+        let SiteBgImgbase64String;
+        let SiteBgImgfileType;
+        let SiteBgImgisImageRemoved = false;
+
+        let HomeImgbase64String;
+        let HomeImgfileType;
+        let HomeImgisImageRemoved = false;
 
         // File validation function
         function validateFile(file) {
-            const validTypes = ['image/svg+xml', 'image/png', 'image/jpeg', 'image/gif'];
+            const validTypes = ['image/svg+xml', 'image/png', 'image/jpeg', 'image/gif', 'image/webp'];
             const maxSize = 5 * 1024 * 1024; // 5MB in bytes
             
             if (!validTypes.includes(file.type)) {
-                alert('Please select a valid image file (SVG, PNG, JPG, or GIF)');
+                alert('Please select a valid image file (SVG, PNG, JPG, WEBP, or GIF)');
                 return false;
             }
             
@@ -504,6 +784,24 @@ if(response.status !== 200 && response.isValid !== true){
             }
         });
 
+        siteBgUpload.addEventListener('change', async function(e) {
+            if (this.files && this.files[0]) {
+                SiteBgImgfileType = (this.files[0].name.split(".")[this.files[0].name.split(".").length - 1]);
+                SiteBgImgbase64String = await imageFileToBase64(this.files[0]);
+                SiteBgImgisImageRemoved = false;
+                handleFileSelect(this.files[0], siteBgPreviewImg, siteBgPreview, siteBgPreviewUploadContainer);
+            }
+        });
+
+        homeImgUpload .addEventListener('change', async function(e) {
+            if (this.files && this.files[0]) {
+                HomeImgfileType = (this.files[0].name.split(".")[this.files[0].name.split(".").length - 1]);
+                HomeImgbase64String = await imageFileToBase64(this.files[0]);
+                HomeImgisImageRemoved = false;
+                handleFileSelect(this.files[0], homeImgPreviewImg, homeImgPreview, homeImgPreviewUploadContainer);
+            }
+        });
+
         // Event listeners for click on upload containers
         logoUploadContainer.addEventListener('click', function() {
             siteLogoUpload.click();
@@ -511,6 +809,14 @@ if(response.status !== 200 && response.isValid !== true){
 
         faviconUploadContainer.addEventListener('click', function() {
             siteFaviconUpload.click();
+        });
+
+        siteBgPreviewUploadContainer.addEventListener('click', function() {
+            siteBgUpload.click();
+        });
+
+        homeImgPreviewUploadContainer.addEventListener('click', function() {
+            homeImgUpload.click();
         });
 
         // Event listeners for remove buttons
@@ -528,6 +834,22 @@ if(response.status !== 200 && response.isValid !== true){
             FAVICONisImageRemoved = true;
             FAVICONbase64String = null;
             removeImage(faviconPreview, faviconUploadContainer);
+        });
+
+        siteBgRemoveBtn.addEventListener('click', function(e) {
+            debugger
+            e.stopPropagation();
+            SiteBgImgisImageRemoved = true;
+            SiteBgImgbase64String = null;
+            removeImage(siteBgPreview, siteBgPreviewUploadContainer);
+        });
+
+        homeImgRemoveBtn.addEventListener('click', function(e) {
+            debugger
+            e.stopPropagation();
+            HomeImgisImageRemoved = true;
+            HomeImgbase64String = null;
+            removeImage(homeImgPreview, homeImgPreviewUploadContainer);
         });
 
         // Converting Image To Base64
@@ -575,36 +897,86 @@ if(response.status !== 200 && response.isValid !== true){
             const user = await response.json();
             console.log(user);
 
-            document.getElementById("SiteTitle").value = user.SiteTitle || "";
-            document.getElementById("SiteMetaDescription").value = user.siteMetaDescription || "";
-            document.getElementById("siteDeployHook").value = user.siteDeployHook || "";
+            document.getElementById("SiteTitle").value = user.siteData.SiteTitle || "";
+            document.getElementById("SiteMetaDescription").value = user.siteData.SiteMetaDescription || "";
+            document.getElementById("siteDeployHook").value = user.siteData.siteDeployHook || "";
+            document.getElementById("newAdminToggle").checked = (user.siteData.isNewAdminAllowed ? true : false);
+            if(user.siteData.SiteBGImage){
+                siteBgPreviewImg.src =  imagePath + user.siteData.SiteBGImage;
+                siteBgPreview.classList.remove("hidden");
+                siteBgPreviewUploadContainer.classList.add("hidden");
+            }
             
-            document.getElementById("siteHomePanelCount").value = user.homePanelCount || "";
-            document.getElementById("sitePanelCount").value = user.sitePanelCount || "";
-
-            if(user.emailAutoReplyContent){
-                document.getElementById("emailFrom").value = user.emailAutoReplyContent.emailFrom || "";
-                document.getElementById("emailSubject").value = user.emailAutoReplyContent.emailSubject || "";
+            document.getElementById("siteHomePanelCount").value = user.siteData.siteHomePanelCount || "";
+            document.getElementById("sitePanelCount").value = user.siteData.sitePanelCount || "";
+            
+            document.getElementById("homeHeaderTitle").value = user.homePageData.homeHeaderTitle || "";
+            document.getElementById("homeHeaderParagraph").value = user.homePageData.homeHeaderParagraph || "";
+            document.getElementById("homePagePanelHeaderText").value = user.homePageData.homePagePanelHeaderText || "";
+            document.getElementById("homePagePanelSubText").value = user.homePageData.homePagePanelSubText || "";
+            document.getElementById("homePagePanelButtonText").value = user.homePageData.homePagePanelButtonText || "";
+            if(user.homePageData.homeBackgroundImage){
+                homeImgPreviewImg.src =  imagePath + user.homePageData.homeBackgroundImage;
+                homeImgPreview.classList.remove("hidden");
+                homeImgPreviewUploadContainer.classList.add("hidden");
+            }
+            
+            document.getElementById("panelPagePanelHeaderText").value = user.panelPageData.panelPagePanelHeaderText || "";
+            document.getElementById("panelPagePanelSubText").value = user.panelPageData.panelPagePanelSubText || "";
+            document.getElementById("panelPageReadMoreBtntext").value = user.panelPageData.panelPageReadMoreBtntext || "";
+            
+            document.getElementById("servicePagePanelHeaderText").value = user.servicePageData.servicePagePanelHeaderText || "";
+            document.getElementById("servicePagePanelSubText").value = user.servicePageData.servicePagePanelSubText || "";
+            
+            document.getElementById("paymentOptionHeaderText").value = user.paymentOptionPageData.paymentOptionHeaderText || "";
+            document.getElementById("paymentOptionSubText").value = user.paymentOptionPageData.paymentOptionSubText || "";
+            
+            if(user.emailData){
+                document.getElementById("emailFrom").value = user.emailData.emailFrom || "";
+                document.getElementById("emailSubject").value = user.emailData.emailSubject || "";
                 // Email Content in Editor JS
                 
                 editor.isReady
                 .then(() => editor.render({
                     time: Date.now(),
-                    blocks: user.emailAutoReplyContent.emailJs_Content || []
+                    blocks: user.emailData.emailJs_Content || []
                 }))
                 .catch((err) => console.error("Render failed", err));
             }
 
-            if(user.siteLog){
-                logoPreviewImg.src =  imagePath + user.siteLog;
+            document.getElementById("footerText").value = user.footerNotes || "";
+            if(user.siteData.logoImage){
+                logoPreviewImg.src =  imagePath + user.siteData.logoImage;
                 logoPreview.classList.remove("hidden");
                 logoUploadContainer.classList.add("hidden");
             }
-            if(user.siteFavicon){
-                faviconPreviewImg.src = imagePath +  user.siteFavicon;
+            if(user.siteData.faviconImage){
+                faviconPreviewImg.src = imagePath +  user.siteData.faviconImage;
                 faviconPreview.classList.remove("hidden");
                 faviconUploadContainer.classList.add("hidden");
             }
+
+            navLinks = user.navbarData.navLinks;
+            document.getElementById("rightButtonTitle").value = user.navbarData.rightButtonTitle || "";
+            document.getElementById("rightButtonLink").value = user.navbarData.rightButtonLink || "";
+            document.getElementById("rightButtonClasses").value = user.navbarData.rightButtonClasses || "";
+            
+            document.getElementById("footerText").value = user.footerData.footerText || "";
+            if(user.footerData.footer3rdCol_Content){
+                editorFooter.isReady
+                .then(() => editorFooter.render({
+                    time: Date.now(),
+                    blocks: user.footerData?.footer3rdCol_Content
+                }))
+                .catch((err) => console.error("Render failed", err));
+            }
+            footerLinks = user.footerData.footerLinks;
+            socialLinks = user.footerData.socialLinks
+            document.getElementById("footerCopyrightText").value = user.footerData.footerCopyrightText || "";
+
+            renderNavLinks();
+            renderFooterLinks();
+            renderSocialLinks();
 
         } catch (error) {
             console.error('Error fetching users:', error);
@@ -621,10 +993,46 @@ if(response.status !== 200 && response.isValid !== true){
                 SiteTitle : obj.SiteTitle,
                 SiteMetaDescription : obj.SiteMetaDescription,
                 siteDeployHook : obj.siteDeployHook,
+                SiteBGImage : "siteBgImg",
                 logoImage : "siteLogo",
                 faviconImage : "siteFavicon",
                 siteHomePanelCount : parseInt(obj.siteHomePanelCount),
                 sitePanelCount : parseInt(obj.sitePanelCount),
+                isNewAdminAllowed : obj.newAdminToggle == "on" ? true : false,
+            },
+            homePageData : {
+                homeHeaderTitle : obj.homeHeaderTitle,
+                homeHeaderParagraph : obj.homeHeaderParagraph,
+                homePagePanelHeaderText : obj.homePagePanelHeaderText,
+                homePagePanelSubText : obj.homePagePanelSubText,
+                homePagePanelButtonText : obj.homePagePanelButtonText,
+                homeBackgroundImage : "HomeImg",
+            },
+            panelPageData : {
+                panelPagePanelHeaderText : obj.panelPagePanelHeaderText,
+                panelPagePanelSubText : obj.panelPagePanelSubText,
+                panelPageReadMoreBtntext : obj.panelPageReadMoreBtntext,
+            },
+            servicePageData : {
+                servicePagePanelHeaderText : obj.servicePagePanelHeaderText,
+                servicePagePanelSubText : obj.servicePagePanelSubText,
+            },
+            paymentOptionPageData : {
+                paymentOptionHeaderText : obj.paymentOptionHeaderText,
+                paymentOptionSubText : obj.paymentOptionSubText,
+            },
+            navbarData : {
+                navLinks,
+                rightButtonTitle : obj.rightButtonTitle,
+                rightButtonClasses : obj.rightButtonClasses,
+                rightButtonLink : obj.rightButtonLink,
+            },
+            footerData : {
+                footerText : obj.footerText,
+                footerLinks,
+                socialLinks,
+                footer3rdCol_Content : JSON.parse(obj.footer3rdCol_Content),
+                footerCopyrightText : obj.footerCopyrightText,
             },
             emailData : {
                 emailFrom : obj.emailFrom,
@@ -632,7 +1040,9 @@ if(response.status !== 200 && response.isValid !== true){
                 emailSubject : obj.emailSubject
             },
             MetaData : {
-                
+                //homeBackgroundImage
+                //Es translations at API end
+                //Pt translations at API end
             }
         }
 
@@ -645,11 +1055,23 @@ if(response.status !== 200 && response.isValid !== true){
             formDataObj.MetaData.FAVICONbase64String = FAVICONbase64String;
             formDataObj.MetaData.FAVICONfileType = FAVICONfileType;
         }
+        if(SiteBgImgbase64String){
+            formDataObj.MetaData.SiteBgbase64String = SiteBgImgbase64String;
+            formDataObj.MetaData.SiteBgfileType = SiteBgImgfileType;
+        }
+        if(HomeImgbase64String){
+            formDataObj.MetaData.HomeImgbase64String = HomeImgbase64String;
+            formDataObj.MetaData.HomeImgfileType = HomeImgfileType;
+        }
         
         if(LOGOisImageRemoved)
             formDataObj.MetaData.LOGOisImageRemoved = LOGOisImageRemoved;
         if(FAVICONisImageRemoved)
             formDataObj.MetaData.FAVICONisImageRemoved = FAVICONisImageRemoved;
+        if(SiteBgImgisImageRemoved)
+            formDataObj.MetaData.SiteBgImgisImageRemoved = SiteBgImgisImageRemoved;
+        if(HomeImgisImageRemoved)
+            formDataObj.MetaData.HomeImgisImageRemoved = HomeImgisImageRemoved;
 
         console.log(formDataObj);
         
@@ -686,6 +1108,14 @@ if(response.status !== 200 && response.isValid !== true){
 
         await editor.save().then(async (outputData) => {
             formData.append("emailJs_Content", JSON.stringify(outputData.blocks)
+                .replaceAll("&nbsp;", " ")
+                .replaceAll("  ", " ")
+                .replaceAll("  ", " ")
+            );
+        })
+
+        await editorFooter.save().then(async (outputData) => {
+            formData.append("footer3rdCol_Content", JSON.stringify(outputData.blocks)
                 .replaceAll("&nbsp;", " ")
                 .replaceAll("  ", " ")
                 .replaceAll("  ", " ")

@@ -4,6 +4,7 @@ import MainLayoutNew from "../../layouts/MainLayoutNew.astro";
 import SMM_panelCardsBelow from "../../components/SMM_panelCardsBelow.astro";
 import {getAPIPath, JsonToHtml, getRandomElements, optimizeImageUrl, shuffleArray, makeWordsClickable,  getImageBasePath} from "../../data/utils"
 import Prose from "../../components/Prose.astro";
+import { Image } from "astro:assets";
 
 //import servicePlatformsData from "../../data/temp-services";
 var APIError = "";
@@ -184,18 +185,21 @@ async function updateAPIWorking(id:string, status : boolean){
                 <div class="heading-section z-[1] w-full flex flex-col lg:flex-row gap-4">
                     
                     <span class="w-full lg:w-1/2 flex justify-center items-center flex-col gap-2">
-                        <img src={getImageBasePath() + panel.panelFeaturedImage}
-                            alt={panel.panelTitle + " Panel Image"}
-                            class="shadow-lg rounded-lg lg:h-[300px]" height="300px" width="100%" />
-                            <span class="flex gap-3 items-center justify-center text-center">
-                                <a target="_blank"
-                                    class="block rounded-lg p-3 bg-blue-600 hover:bg-blue-700 text-white"
-                                    href={panel.panelWebsiteURL}>Visit {panel.panelTitle}</a>
-                                
-                                <a target="_blank"
-                                    class="block rounded-lg p-3 bg-blue-600 hover:bg-blue-700 text-white"
-                                    href="/panels">Check All SMM Panels</a>
-                            </span>
+                        <Image src={
+                            panel.panelFeaturedImage
+                            ? getImageBasePath() + panel.panelFeaturedImage
+                            : "assets/images/no-image-available.jpg"
+                        } alt={panel.panelTitle + " Panel Image"} width="700" height="350" class="shadow-lg rounded-lg lg:h-75" />
+                        
+                        <span class="flex gap-3 items-center justify-center text-center">
+                            <a target="_blank"
+                                class="block rounded-lg p-3 bg-blue-600 hover:bg-blue-700 text-white"
+                                href={panel.panelWebsiteURL}>Visit {panel.panelTitle}</a>
+                            
+                            <a target="_blank"
+                                class="block rounded-lg p-3 bg-blue-600 hover:bg-blue-700 text-white"
+                                href="/panels">Check All SMM Panels</a>
+                        </span>
                         
                     </span>
 
