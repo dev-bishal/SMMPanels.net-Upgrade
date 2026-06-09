@@ -18,9 +18,19 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
           script: |
-            set -e
+            whoami
+            pwd
 
+            node -v
+            npm -v
+
+            which node
+            which npm
+            
             cd var/www/hosted_projects/SMMPanels.net/SMMPanels.net-Upgrade/
+
+            node -v
+            npm -v
 
             echo "Pulling latest code..."
             git pull origin main
