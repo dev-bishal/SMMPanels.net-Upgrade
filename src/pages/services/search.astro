@@ -166,8 +166,8 @@ const allPanelsFetch: any = await fetch(getAPIPath() + "panels").then(
     }
 </style>
 
-<MainLayoutNew title={`Search Services on ${allSiteFetch.SiteTitle}`} metaDescription=`Search among Best SMM Panels, and SMM
-    Services on ${allSiteFetch.SiteTitle}`>
+<MainLayoutNew title={`Search Services on ${allSiteFetch.siteData.SiteTitle}`} metaDescription=`Search among Best SMM Panels, and SMM
+    Services on ${allSiteFetch.siteData.SiteTitle}`>
 
     <div class="content-wrapper text-white flex flex-wrap lg:justify-start justify-center gap-5 my-6 px-5 lg:mt-24 mt-20">
         <article class="flex flex-col gap-5 w-full">
@@ -206,9 +206,9 @@ const allPanelsFetch: any = await fetch(getAPIPath() + "panels").then(
             <!-- Items per page dropdown - add this after the sorting dropdown -->
             <div class="relative w-full md:w-36">
                 <select id="limitSelect" class="w-full appearance-none py-3 px-4 pr-10 rounded-xl glass-input text-white bg-white/20 backdrop-blur cursor-pointer">
-                    <option value="10" selected>10 per page</option>
-                    <option value="25">25 per page</option>
-                    <option value="50">50 per page</option>
+                    <option class="text-black" value="10" selected>10 per page</option>
+                    <option class="text-black" value="25">25 per page</option>
+                    <option class="text-black" value="50">50 per page</option>
                 </select>
                 <i class="fas fa-table-list absolute right-4 top-1/2 -translate-y-1/2 text-white/60 pointer-events-none"></i>
             </div>
@@ -216,12 +216,12 @@ const allPanelsFetch: any = await fetch(getAPIPath() + "panels").then(
             <!-- Rating Filter Dropdown -->
             <div class="relative w-full md:w-56">
                 <select id="ratingFilter" class="w-full appearance-none py-3 px-4 pr-10 rounded-xl glass-input text-white bg-white/20 backdrop-blur cursor-pointer">
-                    <option value="">All Ratings</option>
-                    <option value="1">1★ & above</option>
-                    <option value="2">2★ & above</option>
-                    <option value="3">3★ & above</option>
-                    <option value="4">4★ & above</option>
-                    <option value="5">5★ only</option>
+                    <option class="text-black" value="">All Ratings</option>
+                    <option class="text-black" value="1">1★ & above</option>
+                    <option class="text-black" value="2">2★ & above</option>
+                    <option class="text-black" value="3">3★ & above</option>
+                    <option class="text-black" value="4">4★ & above</option>
+                    <option class="text-black" value="5">5★ only</option>
                 </select>
                 <i class="fas fa-star absolute right-4 top-1/2 -translate-y-1/2 text-white/60 pointer-events-none"></i>
             </div>
@@ -229,13 +229,13 @@ const allPanelsFetch: any = await fetch(getAPIPath() + "panels").then(
             <!-- Sorting Dropdown -->
             <div class="relative w-full md:w-64">
                 <select id="sortBy" class="w-full appearance-none py-3 px-4 pr-10 rounded-xl glass-input text-white bg-white/20 backdrop-blur cursor-pointer">
-                    <option value="min">Price: Low to High (min)</option>
-                    <option value="max">Price: High to Low (max)</option>
-                    <option value="rate">Rate: Low to High</option>
-                    <option value="-rate">Rate: High to Low</option>
-                    <option value="panelRating">Rating: Low to High</option>
-                    <option value="-panelRating">Rating: High to Low</option>
-                    <option value="updated">Latest Updated</option>
+                    <option class="text-black" value="min">Price: Low to High (min)</option>
+                    <option class="text-black" value="max">Price: High to Low (max)</option>
+                    <option class="text-black" value="rate">Rate: Low to High</option>
+                    <option class="text-black" value="-rate">Rate: High to Low</option>
+                    <option class="text-black" value="panelRating">Rating: Low to High</option>
+                    <option class="text-black" value="-panelRating">Rating: High to Low</option>
+                    <option class="text-black" value="updated">Latest Updated</option>
                 </select>
                 <i class="fas fa-arrow-down-wide-short absolute right-4 top-1/2 -translate-y-1/2 text-white/60 pointer-events-none"></i>
             </div>
@@ -304,7 +304,7 @@ const allPanelsFetch: any = await fetch(getAPIPath() + "panels").then(
         order: 'asc',
         limit: 10,
         page: 1,
-        rating: ''
+        panelRating: ''
     };
 
     document.querySelector("#searchTerm").textContent = `Results for - '${getQueryParam()}'`;
@@ -452,7 +452,7 @@ const allPanelsFetch: any = await fetch(getAPIPath() + "panels").then(
                     currentParams.q, 
                     currentParams.sortBy, 
                     currentParams.order,
-                    currentParams.rating
+                    currentParams.panelRating
                 );
                 response = { services: mockData.services, stats: mockData.stats };
             } else {
@@ -463,7 +463,7 @@ const allPanelsFetch: any = await fetch(getAPIPath() + "panels").then(
                 url.searchParams.append('order', currentParams.order);
                 url.searchParams.append('limit', currentParams.limit);
                 url.searchParams.append('page', currentParams.page);
-                if (currentParams.rating) url.searchParams.append('rating', currentParams.rating);
+                if (currentParams.panelRating) url.searchParams.append('panelRating', currentParams.panelRating);
                 
                 const apiResponse = await fetch(url.toString());
                 if (!apiResponse.ok) throw new Error(`API Error: ${apiResponse.status}`);
@@ -576,8 +576,8 @@ const allPanelsFetch: any = await fetch(getAPIPath() + "panels").then(
         if (debounceTimer) clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
             // Update currentParams from UI
-            currentParams.q = searchInput.value.trim() || 'instagram';
-            currentParams.rating = ratingFilter.value;
+            currentParams.q = searchInput.value.trim() || getQueryParam();
+            currentParams.panelRating = ratingFilter.value;
             
             const sortValue = sortSelect.value;
             if (sortValue === 'min') { currentParams.sortBy = 'min'; currentParams.order = 'asc'; }
@@ -601,19 +601,19 @@ const allPanelsFetch: any = await fetch(getAPIPath() + "panels").then(
     }
     
     function resetAllFilters() {
-        searchInput.value = 'instagram';
+        searchInput.value = getQueryParam();
         ratingFilter.value = '';
         sortSelect.value = 'min';
         
         // Add this line to reset limit dropdown
         const limitSelect = document.getElementById('limitSelect');
-        if (limitSelect) limitSelect.value = '25';
+        if (limitSelect) limitSelect.value = '10';
         
         currentParams = {
-            q: 'instagram',
+            q: getQueryParam(),
             sortBy: 'min',
             order: 'asc',
-            limit: 25,  // ← Change to 25
+            limit: 10,  // ← Change to 10
             page: 1,
             rating: ''
         };

@@ -26,22 +26,8 @@ jobs:
 
             which node
             which npm
-            
-            cd var/www/hosted_projects/SMMPanels.net/SMMPanels.net-Upgrade/
-
-            node -v
-            npm -v
-
-            echo "Pulling latest code..."
-            git pull origin main
-
-            echo "Installing dependencies..."
-            npm ci
 
             echo "Building Astro..."
-            npm run build
+            curl http://128.140.35.62:4322/?Task=Full&token=${{ secrets.WEBHOOK_TOKEN}}
 
-            echo "Restarting PM2..."
-            pm2 restart "SMMPanels.net"
-
-            echo "Deployment completed successfully!"
+            echo "Deployment Started successfully!"
