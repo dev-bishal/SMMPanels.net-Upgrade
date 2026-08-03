@@ -213,6 +213,60 @@ else if((lang == "pt"))
     contentPath = metaDataPt;
 ---
 
+<style is:inline>
+    .content h1{
+        font-size: 22px;
+        font-weight: 600;
+        padding-bottom: 15px;
+        padding-top: 10px;
+    }
+    .content h2{
+        font-size: 20px;
+        font-weight: 500;
+        padding-bottom: 15px;
+        padding-top: 10px;
+    }
+    .content h3{
+        font-size: 19px;
+        font-weight: 500;
+        padding-bottom: 15px;
+        padding-top: 10px;
+    }
+    .content h4{
+        font-size: 17px;
+        font-weight: 500;
+        padding-bottom: 15px;
+        padding-top: 10px;
+    }
+    .content h5{
+        font-size: 16px;
+        font-weight: 500;
+        padding-bottom: 15px;
+        padding-top: 10px;
+    }
+    .content h6{
+        font-size: 15px;
+        font-weight: 500;
+        padding-bottom: 15px;
+        padding-top: 10px;
+    }
+    .content ol{
+        list-style-type: decimal;
+        padding-left: 2rem;
+    }
+    .content p{
+        padding-bottom: 15px;
+        padding-top: 10px;
+    }
+
+    .content a{
+        color: #ff78ec;
+    }
+    .content a:hover{
+        text-decoration-line: underline;
+    }
+</style>
+
 <MainLayoutNew 
     {lang}
     title={panel.panelTitle} 
@@ -465,7 +519,7 @@ else if((lang == "pt"))
             <div class="post-content w-full flex flex-col gap-4">
                 <!-- Text Content to be shown here -->
                 <div class="content" set:html={makeWordsClickable(
-                    lang == "es" ? panel.panelTextDescriptionES : panel.panelTextDescriptionPT, 
+                    lang == "es" ? panel.panelTextDescriptionES : (panel.panelTextDescriptionPT || panel.panelTextDescriptionES), 
                     platformListTitles,
                     lang)}></div>
             </div>
@@ -492,61 +546,6 @@ else if((lang == "pt"))
         }
     </div>
 </MainLayoutNew>
-
-
-<style is:inline>
-    .content h1{
-        font-size: 22px;
-        font-weight: 600;
-        padding-bottom: 15px;
-        padding-top: 10px;
-    }
-    .content h2{
-        font-size: 20px;
-        font-weight: 500;
-        padding-bottom: 15px;
-        padding-top: 10px;
-    }
-    .content h3{
-        font-size: 19px;
-        font-weight: 500;
-        padding-bottom: 15px;
-        padding-top: 10px;
-    }
-    .content h4{
-        font-size: 17px;
-        font-weight: 500;
-        padding-bottom: 15px;
-        padding-top: 10px;
-    }
-    .content h5{
-        font-size: 16px;
-        font-weight: 500;
-        padding-bottom: 15px;
-        padding-top: 10px;
-    }
-    .content h6{
-        font-size: 15px;
-        font-weight: 500;
-        padding-bottom: 15px;
-        padding-top: 10px;
-    }
-    .content ol{
-        list-style-type: decimal;
-        padding-left: 2rem;
-    }
-    .content p{
-        padding-bottom: 15px;
-        padding-top: 10px;
-    }
-
-    .content a{
-        color: #ff78ec;
-    }
-    .content a:hover{
-        text-decoration-line: underline;
-    }
-</style>
 
 <script is:inline define:vars={{ApiInfo : APIError}}>
     if(ApiInfo)
