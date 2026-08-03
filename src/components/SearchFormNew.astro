@@ -1,18 +1,28 @@
 ---
-import { metaDataEs } from '../pages/es/data';
-import { metaDataPt } from '../pages/pt/data';
+import { metaDataEs, metaDataPt } from '../data/translations';
+
 
 interface Props {
     searchPagePath: string,
     isDark ?: boolean
-    lang ?: string
+    lang ?: string,
 }
 
 const {searchPagePath, lang="en", isDark=false} = Astro.props;
 
-let contentPath;
-if(lang == "es") contentPath = metaDataEs
-else if(lang == "pt") contentPath = metaDataPt
+let contentPath : {
+    language: string;
+    text: string[];
+} = {
+    language : "",
+    text : []
+};
+
+if(lang == "es")
+    contentPath = metaDataEs;
+else if((lang == "pt"))
+    contentPath = metaDataPt;
+
 ---
 
 <div class="searchBox w-full my-5">

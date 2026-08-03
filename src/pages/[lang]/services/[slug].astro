@@ -2,7 +2,7 @@
 import GlassLayout from "../../../components/GlassLayout.astro";
 import MainLayoutNew from "../../../layouts/MainLayoutNew.astro";
 import {getAPIPath, getRandomElements, getImageBasePath} from "../../../data/utils";
-import { metaDataEs } from "../data";
+import { metaDataEs, metaDataPt } from "../../../data/translations";
 
 interface serviceSchema {
     serviceColor: string;
@@ -14,19 +14,40 @@ interface serviceSchema {
 export const prerender = true;
 export async function getStaticPaths() {
     const allServiceRes: serviceSchema[] = await fetch(getAPIPath() + "services").then(Response => Response.json());
-    return allServiceRes.map((service: any) => ({
-        params: {
-            slug: service.serviceTitle
-                .toString()
-                .toLowerCase()
-                .replaceAll(" ", "-"),
-        },
-        props: { service },
-    }));
+    
+    const languages = ["es", "pt"];
+    
+    // Return a single flat array containing paginated routes for every language
+    return languages.flatMap((lang) => {
+        return allServiceRes.map((service: any) => ({
+            params: {
+                lang,
+                slug: service.serviceTitle
+                    .toString()
+                    .toLowerCase()
+                    .replaceAll(" ", "-"),
+            },
+            props: { service },
+        }));
+    });
 }
 
 const { service } = Astro.props;
+const { lang } = Astro.params;
 let serviceName = service.serviceTitle;
+
+let contentPath : {
+    language: string;
+    text: string[];
+} = {
+    language : "",
+    text : []
+};
+
+if(lang == "es")
+    contentPath = metaDataEs;
+else if((lang == "pt"))
+    contentPath = metaDataPt;
 
 //Fetching All Panels to count How many panels provides the relevant Service
 const allPanelRes = await fetch(getAPIPath() + "panels").then(Response => Response.json());
@@ -53,7 +74,16 @@ relevantServices = getRandomElements(relevantServices, relevantServices.length);
 
 //Fetching Site Settings
 const allSiteFetch:any = await fetch(getAPIPath() + "siteSettings/" + import.meta.env.SITESETTINGSKEY).then(Response => Response.json());
-let contentPath = metaDataEs
+
+let pageTitle="";
+lang == "es" ? pageTitle = " servicios en SMM Panel" : "";
+lang == "pt" ? pageTitle = " serviços em Painel SMM" : "";
+
+let pageMetaDescription="";
+lang == "es" ? pageMetaDescription = `Consulta más de ${count-5} servicios relacionados con `+ service.serviceTitle + `en `+ allSiteFetch.SiteTitle : "";
+lang == "pt" ? pageMetaDescription = `Consulta mais de ${count-5} serviços relacionados com `+ service.serviceTitle + `o `+ allSiteFetch.SiteTitle : "";
+
+
 ---
 <style>
     .offer_panelTitle:hover .panel-links{
@@ -65,8 +95,8 @@ let contentPath = metaDataEs
     }
 </style>
 <MainLayoutNew 
-    lang={metaDataEs.language} title={service.serviceTitle + " servicios en SMM Panel"} 
-    metaDescription={`Consulta más de ${count-5} servicios relacionados con `+ service.serviceTitle + `en `+ allSiteFetch.SiteTitle}
+    {lang} title={service.serviceTitle + pageTitle} 
+    metaDescription={pageMetaDescription}
     pageFeaturedImage = {service.serviceLogo.url} >
 
     <div class="content-wrapper flex flex-wrap lg:justify-start justify-center gap-5 lg:mt-24 mt-20 mb-6 lg:px-5">
@@ -103,14 +133,14 @@ let contentPath = metaDataEs
                 <GlassLayout otherClass="w-full">
                     <div id="FiltersElementsHolder" class="z-[1] w-full p-4 gap-4 items-center flex-wrap justify-between shadow flex">
                         <div>
-                            <label class="mr-2 font-medium">Filtrar por Calificación:</label>
+                            <label class="mr-2 font-medium">{lang == "es" ? "Filtrar por Calificación:" : "Filtrar por Avaliação:"}</label>
                             <select id="ratingFilter" class="border p-1 rounded text-black">
-                                <option value="">todas las calificaciones</option>
-                                <option value="5">⭐ 5 estrellas</option>
-                                <option value="4">⭐ 4 estrellas y más</option>
-                                <option value="3">⭐ 3 estrellas y más</option>
-                                <option value="2">⭐ 2 estrellas y más</option>
-                                <option value="1">⭐ 1 estrella o más</option>
+                                <option value="">{lang == "es" ? "todas las calificaciones" : "todas as classificações"}</option>
+                                <option value="5">⭐ 5 {lang == "es" ? "estrellas" : "estrelas"}</option>
+                                <option value="4">⭐ 4 {lang == "es" ? "estrellas y más" : "estrelas e mais"}</option>
+                                <option value="3">⭐ 3 {lang == "es" ? "estrellas y más" : "estrelas e mais"}</option>
+                                <option value="2">⭐ 2 {lang == "es" ? "estrellas y más" : "estrelas e mais"}</option>
+                                <option value="1">⭐ 1 {lang == "es" ? "estrella o más" : "estrela ou mais"}</option>
                             </select>
                         
                             <div class="mt-6">
@@ -119,12 +149,12 @@ let contentPath = metaDataEs
                                     <div class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-blue-500 relative transition-all duration-300">
                                         <div class="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 peer-checked:translate-x-5 transition-transform duration-300 shadow-sm"></div>
                                     </div>
-                                    <span class="text-sm text-white">Mostrar solo las llegadas más recientes</span>
+                                    <span class="text-sm text-white">{lang == "es" ? "Mostrar solo las llegadas más recientes" : "Mostrar apenas as últimas chegadas"}</span>
                                 </label>
                             </div>
                         </div>
                         <div>
-                            <label class="mr-2 font-medium">Resultados por página:</label>
+                            <label class="mr-2 font-medium">{lang == "es" ? "Resultados por página:" : "Resultados por página:"}</label>
                             <select id="limitSelect" class="border rounded p-2 text-sm text-black">
                                 <option value="15">15 per page</option>
                                 <option value="25" selected>25 per page</option>
@@ -162,11 +192,11 @@ let contentPath = metaDataEs
                 
                 <!-- Pagination -->
                 <div id="PaginationElementHolder" class="p-4 justify-between items-center flex w-full">
-                    <button id="prevPage" class="bg-[#0056b3] text-white px-4 py-1 rounded disabled:opacity-50"><i class="fa-duotone fa-chevrons-left"></i> Anterior</button>
+                    <button id="prevPage" class="bg-[#0056b3] text-white px-4 py-1 rounded cursor-pointer disabled:cursor-no-drop disabled:opacity-50"><i class="fa-duotone fa-chevrons-left"></i> Anterior</button>
                     <span id="pageInfo" class="font-semibold">
                         Page <span id="currentPage">1</span> of <span id="totalPages">1</span>
                     </span>
-                    <button id="nextPage" class="bg-[#0056b3] text-white px-4 py-1 rounded disabled:opacity-50">Siguiente <i class="fa-duotone fa-chevrons-right"></i></button>
+                    <button id="nextPage" class="bg-[#0056b3] text-white px-4 py-1 rounded cursor-pointer disabled:cursor-no-drop disabled:opacity-50">Siguiente <i class="fa-duotone fa-chevrons-right"></i></button>
                 </div>
 
             </div>
@@ -180,7 +210,7 @@ let contentPath = metaDataEs
 
 
 <script is:inline src="/assets/scripts/main.js"></script>
-<script is:inline define:vars={{contentPath, ImagePath : getImageBasePath(), serviceName, APIUrl : getAPIPath()}}>
+<script is:inline define:vars={{lang, contentPath, ImagePath : getImageBasePath(), serviceName, APIUrl : getAPIPath()}}>
     class ServicesTable {
     constructor() {
         this.currentPage = 1;
@@ -296,7 +326,7 @@ let contentPath = metaDataEs
                     <td class="p-4 text-center">$${service.rate}</td>
                     <td class="p-4 text-center">
                         <span class="group flex flex-col justify-center items-center panel-links transition-all ease-in-out">
-                            <a class="hover:underline hover:font-semibold" href="/panels/${service.panelSlug}">
+                            <a class="hover:underline hover:font-semibold" href="${lang != "en" && "/"+lang}/panels/${service.panelSlug}">
                                 <img src="${this.getImageBasePath() + (service.panelImage || 'default-panel.jpg')}" 
                                      alt="${service.panelTitle}" 
                                      class="rounded-md w-16"/>

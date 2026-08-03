@@ -55,14 +55,14 @@ function getMinimumPayDepo(paymentOptions : any[]) {
   return Math.min(...numericValues);
 }
 
-function makeWordsClickable(html:string, words:string[]) {
+function makeWordsClickable(html:string, words:string[], lang? : string) {
     // Iterate through each word in the array
     words.forEach(word => {
       // Create a regular expression to find the word, ignoring case
       const regex = new RegExp(`\\b${word}\\b`, 'gi');
       
       // Replace each occurrence of the word with an anchor tag
-      html = html.replace(regex, `<a href="/services/${word.toLowerCase()}">${word}</a>`);
+      html = html.replace(regex, `<a href="${lang != undefined ? "/" +lang :""}/services/${word.toLowerCase()}">${word}</a>`);
     });
     
     return html;

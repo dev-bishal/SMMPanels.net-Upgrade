@@ -1,18 +1,20 @@
 ---
+import { getRelativeLocaleUrl } from "astro:i18n";
 import GlassLayout from "./GlassLayout.astro";
 
 interface Props {
     img : string,
     title : string,
-    panelsCount : number
+    panelsCount : number,
+    lang ?: string,
 }
 
-const {img, title, panelsCount} = Astro.props;
+const {img, title, panelsCount, lang="en"} = Astro.props;
 
 ---
 
 <GlassLayout otherClass={`w-[30%] lg:w-[24%] min-h-[150px] lg:min-h-max p-3 hover:scale-105 hover:shadow-xl transition-all ease-in-out text-white text-center font-semibold`}>
-    <a href={"/payment-options/"+ title.toLowerCase().replaceAll(" ", "-").replaceAll("/", "-")} class="content flex lg:flex-row flex-col relative items-center gap-3 z-1">
+    <a href={getRelativeLocaleUrl(lang , "/payment-options/"+ title.toLowerCase().replaceAll(" ", "-").replaceAll("/", "-"))} class="content flex lg:flex-row flex-col relative items-center gap-3 z-1">
         <img
             class="brandImg size-[64px] rounded-md object-contain"
             src={img}

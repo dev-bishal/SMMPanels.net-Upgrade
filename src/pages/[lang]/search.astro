@@ -1,12 +1,41 @@
 ---
 import SearchFormNew from "../../components/SearchFormNew.astro";
+import { metaDataEs, metaDataPt } from "../../data/translations";
 import { getAPIPath } from "../../data/utils";
 import MainLayoutNew from "../../layouts/MainLayoutNew.astro";
 
 const allSiteFetch:any = await fetch(getAPIPath() + "siteSettings/" + import.meta.env.SITESETTINGSKEY).then(Response => Response.json());
+
+export function getStaticPaths() {
+    let path :any[] = ["es", "pt"];
+    
+    return path.map((lang : any) => {
+        return {
+            params: {
+                lang: lang
+            }
+        };
+    });
+}
+
+const { lang } = Astro.params;
+
+
+let contentPath : {
+    language: string;
+    text: string[];
+} = {
+    language : "",
+    text : []
+};
+
+if(lang == "es")
+    contentPath = metaDataEs;
+else if((lang == "pt"))
+    contentPath = metaDataPt;
 ---
 
-<MainLayoutNew lang="es" title={` Search on ${allSiteFetch.SiteTitle}`} metaDescription=`Search among Best SMM Panels, and SMM Services Search on ${allSiteFetch.SiteTitle}`>
+<MainLayoutNew {lang} title={` Search on ${allSiteFetch.SiteTitle}`} metaDescription=`Search among Best SMM Panels, and SMM Services Search on ${allSiteFetch.SiteTitle}`>
 
     <div data-apiurl={getAPIPath()} class="content-wrapper text-white flex flex-wrap lg:justify-start justify-center gap-5 my-6 px-5 lg:mt-24 mt-20">
         
@@ -14,7 +43,7 @@ const allSiteFetch:any = await fetch(getAPIPath() + "siteSettings/" + import.met
             <h1 class="searchResTitle text-2xl font-semibold"></h1>
 		    <div class="searchBox flex justify-center items-center">
                 <div class="wrapper lg:w-1/2 w-full">
-                    <SearchFormNew lang="es" searchPagePath={"/es/search"}/>
+                    <SearchFormNew {lang} searchPagePath={"/es/search"}/>
                 </div>
             </div>
             

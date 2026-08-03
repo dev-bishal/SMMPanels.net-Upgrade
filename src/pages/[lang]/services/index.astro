@@ -2,8 +2,8 @@
 import MainLayoutNew from "../../../layouts/MainLayoutNew.astro";
 import SMM_ServicesCardsNew from "../../../components/SMM_servicesCardsNew.astro"
 import SearchFormNew from "../../../components/SearchFormNew.astro";
-import { getAPIPath, getImageBasePath } from "../../../data/utils";
-import { metaDataPt } from "../data";
+import { getAPIPath, getImageBasePath, optimizeImageUrl } from "../../../data/utils";
+import { metaDataEs, metaDataPt } from "../../../data/translations";
 
 const allSiteFetch:any = await fetch(getAPIPath() + "siteSettings/" + import.meta.env.SITESETTINGSKEY).then(Response => Response.json());
 
@@ -14,18 +14,56 @@ interface serviceSchema{
         mediaType: string,
         url: string,
     },
-    serviceCount: number,
     serviceTitle: string,
+    serviceCount: number,
 }
 
 //Fetching All Services
 const allServicesFetch:any = await fetch(getAPIPath() + "services");
 const allServiceRes : serviceSchema[] = await allServicesFetch.json();
 
-let contentPath = metaDataPt
+export function getStaticPaths() {
+    let path :any[] = ["es", "pt"];
+    
+    return path.map((lang : any) => {
+        return {
+            params: {
+                lang: lang
+            }
+        };
+    });
+}
+
+const { lang } = Astro.params;
+
+let contentPath : {
+    language: string;
+    text: string[];
+} = {
+    language : "",
+    text : []
+};
+
+if(lang == "es")
+    contentPath = metaDataEs;
+else if((lang == "pt"))
+    contentPath = metaDataPt;
+
+let pageTitle="";
+lang == "es" ? pageTitle = "Lista de todos los servicios" : "";
+lang == "pt" ? pageTitle = "Lista de todos os serviços" : "";
+
+let pageMetaDescription="";
+lang == "es" ? pageMetaDescription = "Explora todas las plataformas y servicios de redes sociales que soportan los paneles SMM. Desde seguidores en Instagram hasta vistas en YouTube, descubre soluciones personalizadas para hacer crecer tu presencia en línea" : "";
+lang == "pt" ? pageMetaDescription = "Explora todas as plataformas e serviços de redes sociais suportados pelos Painéis de SMM. Desde seguidores no Instagram até visualizações no YouTube, descobre soluções personalizadas para aumentar a tua presença online" : "";
 ---
 
-<MainLayoutNew lang={metaDataPt.language} havePadding={false} title="List of all Services" metaDescription="">
+<MainLayoutNew 
+    lang={lang} 
+    havePadding={false}
+    title={pageTitle} 
+    metaDescription={pageMetaDescription}>
+
     <section class="services-container text-white pt-24">
         
         <h1 class="font-bold text-center text-2xl">{contentPath.text[28]}</h1>
@@ -38,7 +76,7 @@ let contentPath = metaDataPt
                 
                 <div class="searchBox flex justify-center items-center lg:w-1/2 w-full">
                     <div class="wrapper w-full">
-                        <SearchFormNew lang={metaDataPt.language} searchPagePath={"/pt/services/search"} isDark={true}/>
+                        <SearchFormNew {lang} searchPagePath={"/es/services/search"} isDark={true}/>
                     </div>
                 </div>
             </div>
@@ -47,7 +85,8 @@ let contentPath = metaDataPt
                 {
                     allServiceRes.map((service, index)=>(
                         <SMM_ServicesCardsNew 
-                            lang="pt"
+                            {lang}
+                            translation={contentPath}
                             servicesCount={service.serviceCount} 
                             title={service.serviceTitle} 
                             imageLogoPath={getImageBasePath() + service.serviceLogo}>

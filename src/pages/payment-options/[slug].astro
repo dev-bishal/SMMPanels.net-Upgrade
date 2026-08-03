@@ -46,9 +46,9 @@ for (let i = 0; i < allPanelRes.length; i++) {
     
     <div class="content-wrapper w-full flex flex-wrap lg:flex-col lg:justify-start items-center justify-center gap-5 mt-20 my-6 px-5 text-white">
 
-        <article class="flex flex-col gap-5 lg:max-w-[1260px] xl:max-w-[1400px] ">
+        <article class="flex flex-col gap-5 lg:w-[1260px] xl:w-[1400px]">
             <h1 class="font-bold text-center text-2xl">Find all SMM panels that offer <span class="capitalize">{slug}</span> as a payment option</h1>
-            <h2 class="font-semibold text-xl flex gap-2">SMM Panels with <span class="capitalize flex gap-2"> <img src={getImageBasePath() + paymentOption.paymentLogo} height="28px" class="size-7" alt={`${slug} Logo`}> {slug}</h2>
+            <h2 class="font-semibold text-xl flex gap-2">SMM Panels with <img src={getImageBasePath() + paymentOption.paymentLogo} height="28px" class="size-7" alt={`${slug} Logo`}> {slug}</h2>
             
             <div class="wrapper flex lg:justify-start md:justify-center items-center flex-wrap gap-4 gap-y-6 my-5">
                 {

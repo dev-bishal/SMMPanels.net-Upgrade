@@ -158,12 +158,12 @@ if(response.status !== 200 && response.isValid !== true){
                                         <img id="avatarImg" class="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover" 
                                             src="/assets/images/user2.png" 
                                             onerror="this.onerror=null; this.src='/assets/images/user2.png';"
-                                            alt="Profile picture">
+                                            alt="Profile picture" />
                                         <div class="absolute bottom-2 right-2">
                                             <label for="avatar-upload" class="avatar-upload cursor-pointer w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-lg hover:bg-blue-700">
                                                 <i class="fas fa-camera text-sm"></i>
                                             </label>
-                                            <input type="file" id="avatar-upload" name="avatar-upload" class="hidden" accept="image/*">
+                                            <input type="file" id="avatar-upload" name="avatar-upload" class="hidden" accept="image/*" />
                                         </div>
                                     </div>
                                 </div>
@@ -180,37 +180,43 @@ if(response.status !== 200 && response.isValid !== true){
                                     </div>
                                 </div>
                             </div>
-    
+                            
                             <!-- Personal Information -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div class="input-group">
                                     <label class="block text-gray-700 text-sm font-medium mb-2">Login UserID</label>
-                                    <input type="text" title="You cannot edit your UserID (Its permanent)" disabled class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value="" name ="userid" id ="userid">
+                                    <input type="text" title="You cannot edit your UserID (Its permanent)" disabled class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value="" name ="userid" id ="userid" />
                                 </div>
                                 <div class="input-group">
                                     <label class="block text-gray-700 text-sm font-medium mb-2">Full Name</label>
-                                    <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value="" name="userFullname" id="userFullname">
+                                    <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value="" name="userFullname" id="userFullname" />
                                 </div>
                             </div>
+
+                            <div class="mt-6">
+                                <div class="input-group">
+                                    <span class="text-sm flex mb-2 gap-2 items-center">
+                                        <label class="block text-gray-700 text-sm font-medium">Email Address</label>
+                                        (Required for Password Reset)</span>
+                                    <input type="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="john.doe@example.com" name="userEmailAddress" id="userEmailAddress" />
+                                </div>
+                            </div>
+
+                            
+                            
     
+                            
                             <div class="mt-6">
                                 <div class="input-group">
-                                    <span class="text-sm flex mb-2 gap-2 items-center"><label class="block text-gray-700 text-sm font-medium">Email Address</label> (Required for Password Reset)</span class="flex gap-2 items-center">
-                                    <input type="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="john.doe@example.com" name="userEmailAddress" id="userEmailAddress">
+                                    <span class="text-sm flex mb-2 gap-2 items-center"><label class="block text-gray-700 text-sm font-medium">Designation</label> (Required for Author Card)</span>
+                                    <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Senior SMM Analyst" name="userDesignation" id="userDesignation" />
                                 </div>
                             </div>
 
                             <div class="mt-6">
                                 <div class="input-group">
-                                    <span class="text-sm flex mb-2 gap-2 items-center"><label class="block text-gray-700 text-sm font-medium">Designation</label> (Required for Author Card)</span class="flex gap-2 items-center">
-                                    <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Senior SMM Analyst" name="userDesignation" id="userDesignation">
-                                </div>
-                            </div>
-
-                            <div class="mt-6">
-                                <div class="input-group">
-                                    <span class="text-sm flex mb-2 gap-2 items-center"><label class="block text-gray-700 text-sm font-medium">Bio Description</label> (Required for Author Card)</span class="flex gap-2 items-center">
-                                    <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Senior SMM Analyst with 8+ years of experience in social media marketing and panel testing." name="userBioDescription" id="userBioDescription">
+                                    <span class="text-sm flex mb-2 gap-2 items-center"><label class="block text-gray-700 text-sm font-medium">Bio Description</label> (Required for Author Card)</span>
+                                    <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Senior SMM Analyst with 8+ years of experience in social media marketing and panel testing." name="userBioDescription" id="userBioDescription" />
                                 </div>
                             </div>
                             
@@ -222,6 +228,7 @@ if(response.status !== 200 && response.isValid !== true){
                                     <i class="fas fa-save mr-2"></i> Save Changes
                                 </button>
                             </div>
+
                         </div>
                         
                     </form>
@@ -236,7 +243,7 @@ if(response.status !== 200 && response.isValid !== true){
                             <div class="input-group mb-6">
                                 <label class="block text-gray-700 text-sm font-medium mb-2">Current Password</label>
                                 <div class="relative">
-                                    <input type="password" id="current-password" name="oldPassword" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10">
+                                    <input type="password" id="current-password" name="oldPassword" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10" />
                                     <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 toggle-password" data-target="current-password">
                                         <i class="fas fa-eye"></i>
                                     </button>
@@ -248,7 +255,7 @@ if(response.status !== 200 && response.isValid !== true){
                             <div class="input-group mb-6">
                                 <label class="block text-gray-700 text-sm font-medium mb-2">New Password</label>
                                 <div class="relative">
-                                    <input type="password" id="new-password" name="newPassword" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10">
+                                    <input type="password" id="new-password" name="newPassword" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10" />
                                     <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 toggle-password" data-target="new-password">
                                         <i class="fas fa-eye"></i>
                                     </button>
@@ -268,7 +275,7 @@ if(response.status !== 200 && response.isValid !== true){
                             <div class="input-group mb-6">
                                 <label class="block text-gray-700 text-sm font-medium mb-2">Confirm New Password</label>
                                 <div class="relative">
-                                    <input type="password" id="confirm-password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10">
+                                    <input type="password" id="confirm-password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10" />
                                     <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 toggle-password" data-target="confirm-password">
                                         <i class="fas fa-eye"></i>
                                     </button>

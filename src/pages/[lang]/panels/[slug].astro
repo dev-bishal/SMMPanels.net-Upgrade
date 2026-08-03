@@ -3,9 +3,8 @@ import GlassLayout from '../../../components/GlassLayout.astro';
 import { getAPIPath, getImageBasePath, getRandomElements, JsonToHtml, makeWordsClickable, shuffleArray } from '../../../data/utils';
 import MainLayoutNew from '../../../layouts/MainLayoutNew.astro';
 import SMM_panelCardsBelow from "../../../components/SMM_panelCardsBelow.astro";
-import { metaDataEs } from '../data';
-
-let contentPath = metaDataEs
+import { metaDataEs, metaDataPt } from '../../../data/translations';
+import { getRelativeLocaleUrl } from 'astro:i18n';
 
 //import servicePlatformsData from "../../data/temp-services";
 var APIError = "";
@@ -20,17 +19,22 @@ export async function getStaticPaths() {
     const allPanelsFetch: any = await fetch(getAPIPath() + "panels");
     const allPanelRes: panelSchema[] = await allPanelsFetch.json();
     
-    return allPanelRes.map((panel: any) => ({
-        params: { slug: panel.panelSlug },
-        props: { panel },
-    }));
+    const languages = ["es", "pt"];
+    
+    // Return a single flat array containing paginated routes for every language
+    return languages.flatMap((lang) => {
+        return allPanelRes.map((panel: any) => ({
+            params: { lang, slug: panel.panelSlug },
+            props: { panel },
+        }));
+    });
 }
 
 // Fetching All Payment Methods for internal Linking and Images
 const allPaymentOptions: any = await fetch(getAPIPath() + "payments").then(Response => Response.json());
 
 const { panel } = Astro.props;
-const { slug } = Astro.params;
+const { slug, lang } = Astro.params;
 // console.log(panel);
 
 var ratingCollection: String[] = [];
@@ -151,7 +155,7 @@ interface panelSchema {
 }
 
 // Saving API services in Database
-syncPanelServices(slug, servicesResponse);
+// syncPanelServices(slug, servicesResponse);
 async function syncPanelServices(panelSlug : string , allServices : any[]) {
     // 1. Generate the ID ONCE at the start
     const syncId = `sync_${Date.now()}`; 
@@ -194,12 +198,28 @@ async function syncPanelServices(panelSlug : string , allServices : any[]) {
     }
     console.log("Sync Complete!");
 }
+
+let contentPath : {
+    language: string;
+    text: string[];
+} = {
+    language : "",
+    text : []
+};
+
+if(lang == "es")
+    contentPath = metaDataEs;
+else if((lang == "pt"))
+    contentPath = metaDataPt;
 ---
 
 <MainLayoutNew 
-    lang={metaDataEs.language}
+    {lang}
     title={panel.panelTitle} 
-    metaDescription={panel.panelMetaDescriptionES} 
+    translations={contentPath}
+    metaDescription={
+    lang == "es" ? panel.panelMetaDescriptionES : panel.panelMetaDescriptionPt
+    } 
     pageType="article"
     pageFeaturedImage={getImageBasePath() + panel.panelFeaturedImage}>
     <div class="content-wrapper w-full flex flex-wrap lg:flex-col lg:justify-start items-center justify-center gap-5 mt-20 my-6 px-5 text-white">
@@ -311,7 +331,7 @@ async function syncPanelServices(panelSlug : string , allServices : any[]) {
             <div class="article-wrapper flex lg:flex-row flex-col gap-4">
                 <!-- Search Description here -->
                 <div class="post-content lg:w-[60%] w-full flex flex-col gap-4">
-                    <p>{panel.panelMetaDescriptionES}</p>
+                    <p>{lang == "es" ? panel.panelMetaDescriptionES : panel.panelMetaDescriptionPt}</p>
                     <!-- Payment Options -->
                     <GlassLayout otherClass="mb-4" isTopMarginEnabled={false}>
                         <div class="paymentOptions z-[1] w-full p-3 rounded-md shadow-md">
@@ -364,10 +384,11 @@ async function syncPanelServices(panelSlug : string , allServices : any[]) {
                                     platformList.map((service: any) => (
                                         <a
                                             href={
-                                                "/services/" +
+                                                getRelativeLocaleUrl(lang, "services/" +
                                                 service.serviceTitle
                                                     .toLowerCase()
-                                                    .replaceAll(" ", "-")
+                                                    .replaceAll(" ", "-"))
+                                                
                                             }
                                             class="lg:px-4 px-2 capitalize lg:py-2 py-1 lg:text-base text-[15px] rounded-md cursor-pointer hover:brightness-75 [text-shadow:_2px_-1px_2px_rgb(0_0_0_/_74%)]"
                                             style={`background-color: ${service.serviceColor}`}
@@ -443,7 +464,10 @@ async function syncPanelServices(panelSlug : string , allServices : any[]) {
             
             <div class="post-content w-full flex flex-col gap-4">
                 <!-- Text Content to be shown here -->
-                <div class="content" set:html={makeWordsClickable(panel.panelTextDescriptionES, platformListTitles)}></div>
+                <div class="content" set:html={makeWordsClickable(
+                    lang == "es" ? panel.panelTextDescriptionES : panel.panelTextDescriptionPT, 
+                    platformListTitles,
+                    lang)}></div>
             </div>
             
         </article>
@@ -457,7 +481,7 @@ async function syncPanelServices(panelSlug : string , allServices : any[]) {
                 {
                     allPanelsData2.slice(0, 3).map((panels) =>(
                         <SMM_panelCardsBelow 
-                            lang = {metaDataEs.language}
+                            {lang}
                             imageSrc={getImageBasePath() + panels.panelFeaturedImage}
                             panelTitle = {panels.panelTitle}
                             slugURL = {panels.panelSlug}

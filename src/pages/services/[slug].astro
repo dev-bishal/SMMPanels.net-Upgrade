@@ -176,11 +176,11 @@ const allSiteFetch:any = await fetch(getAPIPath() + "siteSettings/" + import.met
                 
                 <!-- Pagination -->
                 <div id="PaginationElementHolder" class="p-4 justify-between items-center flex w-full">
-                    <button id="prevPage" class="bg-[#0056b3] text-white px-4 py-1 rounded disabled:opacity-50"><i class="fa-duotone fa-chevrons-left"></i> Previous</button>
+                    <button id="prevPage" class="bg-[#0056b3] text-white px-4 py-1 rounded cursor-pointer disabled:cursor-no-drop disabled:opacity-50"><i class="fa-duotone fa-chevrons-left"></i> Previous</button>
                     <span id="pageInfo" class="font-semibold">
                         Page <span id="currentPage">1</span> of <span id="totalPages">1</span>
                     </span>
-                    <button id="nextPage" class="bg-[#0056b3] text-white px-4 py-1 rounded disabled:opacity-50">Next <i class="fa-duotone fa-chevrons-right"></i></button>
+                    <button id="nextPage" class="bg-[#0056b3] text-white px-4 py-1 rounded cursor-pointer disabled:cursor-no-drop disabled:opacity-50">Next <i class="fa-duotone fa-chevrons-right"></i></button>
                 </div>
 
             </div>

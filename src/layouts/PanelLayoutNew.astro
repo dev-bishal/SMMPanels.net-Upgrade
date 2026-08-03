@@ -1,11 +1,13 @@
 ---
+import "../global.css"
 import { SEO } from "astro-seo";
 
 import NavbarNew from "../components/NavbarNew.astro";
 import FooterNew from "../components/FooterNew.astro";
-import { getAPIPath } from "../data/utils";
+import { getAPIPath, getImageBasePath } from "../data/utils";
 interface Props {
     title:string,
+    lang ?: string,
     metaDescription?:string,
     pageType ?: string,
     pageFeaturedImage ?: string
@@ -16,6 +18,7 @@ const allSiteFetch:any = await fetch(getAPIPath() + "siteSettings/" + import.met
 
 const {
     title, 
+    lang = "en", 
     metaDescription = allSiteFetch.siteMetaDescription,
     pageType = "website",
     pageFeaturedImage = allSiteFetch.siteFavicon.url,
@@ -62,7 +65,7 @@ const {
     
 </head>
 <body>
-    <NavbarNew logoImgSrc={allSiteFetch.siteLog.url} siteTitle={allSiteFetch.SiteTitle}/>
+    <NavbarNew {lang} logoImgSrc={getImageBasePath() + allSiteFetch.siteData.logoImage} siteTitle={allSiteFetch.siteData.SiteTitle} navData={allSiteFetch.navbarData}/>
     
     <div class="main-placeholder py-5 flex justify-center items-center bg-slate-100">
         <div class="main-container lg:w-[1150px]">

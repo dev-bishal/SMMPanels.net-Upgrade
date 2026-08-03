@@ -1,8 +1,6 @@
 ---
+import { getRelativeLocaleUrl } from "astro:i18n";
 import { Image } from 'astro:assets';
-import { metaDataEs } from '../pages/es/data';
-import { metaDataPt } from '../pages/pt/data';
-
 
 interface Props {
     imageSrc : string,
@@ -12,9 +10,10 @@ interface Props {
     avrg : number,
     slugURL : string,
     lang ?: string;
+    translations ?: any;
 }
 
-const {imageSrc ,panelTitle ,service, rating, avrg, slugURL, lang = "en"} = Astro.props;
+const {imageSrc ,panelTitle ,service, rating, avrg, slugURL, lang = "en", translations} = Astro.props;
 
 var ratingCollection : String[] = [];
 for (let j = 0; j < 5; j++) {
@@ -30,9 +29,7 @@ if(lang != "en"){
     langDirectory = "/"+ lang
 }
 
-let contentPath;
-if(lang == "es") contentPath = metaDataEs
-else if(lang == "pt") contentPath = metaDataPt
+let contentPath = translations
 
 ---
 <style is:inline>
@@ -46,7 +43,7 @@ else if(lang == "pt") contentPath = metaDataPt
 
 <article class="lg:w-[32%] md:w-[48%] overflow-hidden relative w-full rounded-lg shadow-sm hover:shadow-2xl hover:-translate-y-2 hover:scale-105 transition-all ease-in-out duration-150 group">
         
-    <a class="relative flex justify-center items-center" href={langDirectory + "/panels/" + slugURL}>
+    <a class="relative flex justify-center items-center" href={getRelativeLocaleUrl(lang, "panels/" + slugURL)}>
         <Image src={
             imageSrc != ""
             ? imageSrc 
@@ -57,7 +54,7 @@ else if(lang == "pt") contentPath = metaDataPt
     
     <div class="data group-hover:translate-y-0 w-full rounded-b-lg text-white p-4 absolute translate-y-16 bg-[#00000069] backdrop-blur-sm bottom-0 left-0 transition-all ease-in-out duration-150">
         <h2 class="font-bold text-center">
-            <a class="hover:underline" href={langDirectory + "/panels/" + slugURL}>{panelTitle}</a> 
+            <a class="hover:underline" href={getRelativeLocaleUrl(lang, "panels/" + slugURL)}>{panelTitle}</a> 
             <span class="inline-flex justify-center items-center size-5 rounded-full text-white bg-sky-500 shadow-lg shadow-blue-400">
                 <i class="fa-solid fa-angle-right"></i>
             </span>
@@ -79,9 +76,9 @@ else if(lang == "pt") contentPath = metaDataPt
                 {(service > 0) && <i class="text-sky-500 fa-solid fa-icons fa-fw"></i>}
                 {(service > 0) ? service.toString() : ""}
                 {(service > 1) && 
-                (lang == "en" ? "Services"  : contentPath?.text[23])}
+                (lang == "en" ? " Services"  : " "+contentPath?.text[23])}
                 {(service == 1) && 
-                (lang == "en" ? "Service" : contentPath?.text[22])}
+                (lang == "en" ? " Service" : " "+contentPath?.text[22])}
             </span>
         </span>
     </div>

@@ -19,7 +19,11 @@ const allSiteFetch:any = await fetch(getAPIPath() + "siteSettings/" + import.met
 
 ---
 
-<MainLayoutNew havePadding={false} title="List of all Services" metaDescription="">
+<MainLayoutNew 
+    havePadding={false} 
+    title="List of all Services" 
+    metaDescription="Explore all social media platforms and services supported by SMM Panels. From Instagram followers to YouTube views, discover tailored solutions to grow your online presence">
+    
     <section class="services-container text-white pt-24">
         
         <h1 class="font-bold text-center text-2xl">{allSiteFetch.servicePageData.servicePagePanelHeaderText}</h1>

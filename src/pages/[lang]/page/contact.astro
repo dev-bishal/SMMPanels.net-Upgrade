@@ -3,7 +3,7 @@ import ButtonUI from "../../../components/ButtonUI.astro";
 import GlassLayout from "../../../components/GlassLayout.astro";
 import { getAPIPath, JsonToHtml, getImageBasePath } from "../../../data/utils";
 import MainLayoutNew from "../../../layouts/MainLayoutNew.astro";
-import { metaDataEs } from "../data";
+import { metaDataEs, metaDataPt } from "../../../data/translations";
 
 //Pages API for Contact Page Content Only
 const allPagesFetch: any = await fetch(getAPIPath() + "pages").then(
@@ -27,16 +27,33 @@ const allSettings = await fetch(getAPIPath() + "siteSettings/" + import.meta.env
     },
 }).then(Response => Response.json());
 
-let contentPath = metaDataEs
+const { lang } = Astro.params;
+
+let contentPath : {
+    language: string;
+    text: string[];
+} = {
+    language : "",
+    text : []
+};
+
+if(lang == "es")
+    contentPath = metaDataEs;
+else if((lang == "pt"))
+    contentPath = metaDataPt;
+
 ---
 
-<MainLayoutNew lang={metaDataEs.language} title={contentPath.text[15]} metaDescription={contactPageContent.pageMetaDescriptionES}>
+<MainLayoutNew 
+    {lang} 
+    title={contentPath.text[15]} 
+    metaDescription={lang == "es" ? contactPageContent.pageMetaDescriptionES : contactPageContent.pageMetaDescriptionPT}>
     <div
         class="content-wrapper text-white flex flex-wrap lg:justify-start justify-center gap-5 my-6 px-5 lg:mt-24 mt-20"
     >
         <article class="leading-8">
             <h1>{contentPath.text[15]}</h1>
-        <div class="content" set:html={contactPageContent.pageTextDescriptionES} />
+        <div class="content" set:html={lang == "es" ? contactPageContent.pageTextDescriptionES : contactPageContent.pageTextDescriptionPT} />
 
             <div class="responseMessage hidden w-full justify-center items-center flex-col gap-3" >
                 <p class="font-bold text-center text-3xl my-4"></p>
@@ -84,7 +101,7 @@ let contentPath = metaDataEs
                                     id="sendMsgBtn"
                                     title={contentPath.text[60]}
                                     onclickFunction="submit"
-                                    iconClass="fa-solid fa-paper-plane-top"
+                                    iconClass="fa-solid fa-paper-plane"
                                 />
                             </span>
                         </div>

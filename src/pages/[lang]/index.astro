@@ -5,11 +5,39 @@ import SMM_panelCardsNew from "../../components/SMM_panelCardsNew.astro";
 import ServicesSlider from "../../components/ServicesSlider.astro";
 import { getAPIPath, getImageBasePath } from "../../data/utils";
 import MainLayoutNew from "../../layouts/MainLayoutNew.astro";
-import { metaDataPt } from "./data";
 import ButtonUI from "../../components/ButtonUI.astro";
 import { Image } from "astro:assets";
+import { getRelativeLocaleUrl } from "astro:i18n";
 
-let contentPath = metaDataPt
+import { metaDataEs, metaDataPt } from "../../data/translations";
+
+export function getStaticPaths() {
+    let path :any[] = ["es", "pt"];
+    
+    return path.map((lang : any) => {
+        return {
+            params: {
+                lang: lang
+            }
+        };
+    });
+}
+
+const { lang } = Astro.params;
+
+let contentPath : {
+    language: string;
+    text: string[];
+} = {
+    language : "",
+    text : []
+};
+
+if(lang == "es")
+    contentPath = metaDataEs;
+else if((lang == "pt"))
+    contentPath = metaDataPt;
+
 
 interface serviceSchema{
     serviceColor: string,
@@ -30,6 +58,7 @@ interface panelStructure {
 	panelAPIKey: string;
 	panelAPILink: string;
 	panelSlug: string;
+	panelMetaDescriptionES: string;
 	panelMetaDescriptionPT: string;
 	panelTitle: string;
 	panelTotalServices: number;
@@ -54,7 +83,7 @@ const allSidebarWidgetsFetch :any[] = [];
         transform: translate(0, 0);
     }
 </style>
-<MainLayoutNew title="Home" lang={metaDataPt.language}>
+<MainLayoutNew title="Home" {lang} translations={contentPath}>
 	
 	<!-- Hero section -->
 	<GlassLayout otherClass='mt-20 my-6 px-5'>
@@ -62,10 +91,10 @@ const allSidebarWidgetsFetch :any[] = [];
             <div class="hero-content flex flex-col lg:flex-row justify-center items-center h-full w-full">
                 <div data-aos="fade-right" data-aos-delay="2500"
                     class="part lg:w-1/2 mt-10 lg:mt-0 h-full flex flex-col justify-center gap-5 text-white">
-                    <h2 class="font-semibold text-5xl">{allSiteFetch.homePageData.homeHeaderTitlePt}</h2>
-                    <p>{allSiteFetch.homePageData.homeHeaderParagraphPt}</p>
+                    <h2 class="font-semibold text-5xl">{allSiteFetch.homePageData.homeHeaderTitleEs}</h2>
+                    <p>{allSiteFetch.homePageData.homeHeaderParagraphEs}</p>
                     <div class="CTABtn flex gap-3">
-						<SearchFormNew lang={metaDataPt.language} searchPagePath=`/${metaDataPt.language}/search`/>
+						<SearchFormNew {lang} searchPagePath=`/${lang}/search`/>
                     </div>
                 </div>
                 <div data-aos="fade-left" data-aos-delay="2500" class="part lg:w-1/2 h-full flex justify-center items-center">
@@ -78,7 +107,7 @@ const allSidebarWidgetsFetch :any[] = [];
     <!-- Services Slider section -->
     {
         allServiceRes.length > 0 &&
-        <ServicesSlider lang={metaDataPt.language} allServicesData={allServiceRes} />
+        <ServicesSlider {lang} translations={contentPath} allServicesData={allServiceRes} />
     }
 
     <!-- Panels Sections-->
@@ -102,8 +131,8 @@ const allSidebarWidgetsFetch :any[] = [];
                     <article class="article-Schema relative overflow-hidden flex flex-col justify-center rounded-lg transition-all ease-in-out hover:shadow-xl group">
                         <img src={getImageBasePath() + panelsList[0].panelFeaturedImage} class="rounded-lg hover:brightness-75 w-full" />
                         <div class="textContent absolute translate-y-full bg-[#000000e2] p-6 bottom-0 transition-all ease-in-out duration-500 w-full group-hover:translate-y-0">
-                            <a class="contents hover:text-blue-300" href={"/pt/panels/"+ panelsList[0].panelSlug}><h3 class="w-fit cursor-pointer font-bold text-xl line-clamp-2">{panelsList[0].panelTitle}</h3></a>
-                            <span class="description text-xs" set:html={panelsList[0].panelMetaDescriptionPT && panelsList[0].panelMetaDescriptionPT.substring(0, 150) + "..."}></span>
+                            <a class="contents hover:text-blue-300" href={getRelativeLocaleUrl(lang, "panels/"+ panelsList[0].panelSlug)}><h3 class="w-fit cursor-pointer font-bold text-xl line-clamp-2">{panelsList[0].panelTitle}</h3></a>
+                            <span class="description text-xs" set:html={panelsList[0].panelMetaDescriptionES.substring(0, 150) + "..."}></span>
                         </div>
                     </article>
                 </div>
@@ -111,7 +140,7 @@ const allSidebarWidgetsFetch :any[] = [];
                 <div data-aos="fade-left" class="part lg:w-1/2 h-auto flex flex-col gap-[20px] justify-between items-center">
 
                     {
-                        panelsList.slice(1, 3).map((panel:any, index:number)=>(
+                        panelsList.slice(1, 3).map((panel:any, index: number)=>(
                             <article class="article-Schema flex lg:w-auto w-full flex-col lg:flex-row justify-center p-3 rounded-lg bg-[#00000035] gap-3 transition-all ease-in-out hover:scale-105 hover:shadow-xl">
                                 <Image src={
                                     panel.panelFeaturedImage
@@ -120,8 +149,8 @@ const allSidebarWidgetsFetch :any[] = [];
                                 } alt={panel.panelTitle} width="440" height="225" class="rounded-lg lg:w-[15rem] w-full lg:h-[9rem] object-cover hover:brightness-75" />
                         
                                 <span class="details">
-                                    <a class="contents hover:text-blue-300" href={"/pt/panels/"+ panel.panelSlug}><h3 class="w-fit cursor-pointer font-bold text-xl line-clamp-2">{panel.panelTitle}</h3></a>
-                                    <span class="hidden lg:block description my-3 text-sm line-clamp-3" set:html={panelsList[0].panelMetaDescriptionPT && panelsList[0].panelMetaDescriptionPT.substring(0, 150) + "..."}></span>
+                                    <a class="contents hover:text-blue-300" href={getRelativeLocaleUrl(lang,"panels/"+ panel.panelSlug)}><h3 class="w-fit cursor-pointer font-bold text-xl line-clamp-2">{panel.panelTitle}</h3></a>
+                                    <span class="hidden lg:block description my-3 text-sm line-clamp-3" set:html={panelsList[0].panelMetaDescriptionES.substring(0, 150) + "..."}></span>
                                 </span>
                             </article>
                         ))
@@ -141,8 +170,8 @@ const allSidebarWidgetsFetch :any[] = [];
                         {
                             panelsList.slice(secondListStartIndex, allSiteFetch.siteData.siteHomePanelCount).map((panel: panelStructure, index:number) => (
                                 <SMM_panelCardsNew
-                                    lang ={metaDataPt.language}
-                                    descriptionText={panel.panelMetaDescriptionPT ? panel.panelMetaDescriptionPT : "" }
+                                    lang ={lang}
+                                    descriptionText={lang == "es" ? panel.panelMetaDescriptionES : panel.panelMetaDescriptionPT}
                                     imageSrc = {panel.panelFeaturedImage == null ? "" : panel.panelFeaturedImage }
                                     panelTitle={panel.panelTitle}
                                     slugURL={panel.panelSlug}
@@ -154,7 +183,7 @@ const allSidebarWidgetsFetch :any[] = [];
                 {
                     (responsePanels.length > 3) &&
                         <span class="flex justify-center items-center w-full my-4">
-                                <ButtonUI title={contentPath.text[11]} link='/pt/panels'></ButtonUI>
+                                <ButtonUI title={contentPath.text[11]} link={getRelativeLocaleUrl(lang,'panels')}></ButtonUI>
                         </span>
                 }
             </div>

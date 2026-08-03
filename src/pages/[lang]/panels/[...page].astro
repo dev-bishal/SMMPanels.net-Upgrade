@@ -2,13 +2,24 @@
 import MainLayoutNew from "../../../layouts/MainLayoutNew.astro";
 import SMM_panelCards2New from "../../../components/SMM_panelCards2New.astro";
 import {getAPIPath, getImageBasePath} from "../../../data/utils"
-import { metaDataPt } from '../data';
+import { metaDataEs, metaDataPt } from '../../../data/translations';
 export const prerender = true;
 
-export async function getStaticPaths({ paginate } : {paginate : any}) {
-    const responsePanels = await fetch(getAPIPath() + "panels").then(Response => Response.json());
-
-    return paginate(responsePanels.reverse(), { pageSize: 15 });
+export async function getStaticPaths({ paginate }: { paginate: any }) {
+    const responsePanels = await fetch(getAPIPath() + "panels").then((res) =>
+        res.json()
+    );
+    const reversedPanels = responsePanels.reverse();
+    
+    const languages = ["es", "pt"];
+    
+    // Return a single flat array containing paginated routes for every language
+    return languages.flatMap((lang) => {
+        return paginate(reversedPanels, {
+            params: { lang },
+            pageSize: 15,
+        });
+    });
 }
 
 interface panelStructure {
@@ -46,6 +57,7 @@ interface Props {
 }
 
 const { page } = Astro.props;
+const { lang } = Astro.params;
 
 let allPanelAPIs : string[] = [];
 let allPanelServiceCount : any[][] = [];
@@ -87,11 +99,39 @@ for (let i = 0; i < allPanelAPIs.length; i++) {
 }
 
 const {data, ...rest} = page;
-let contentPath = metaDataPt
+
+let contentPath : {
+    language: string;
+    text: string[];
+} = {
+    language : "",
+    text : []
+};
+
+if(lang == "es")
+    contentPath = metaDataEs;
+else if((lang == "pt"))
+    contentPath = metaDataPt;
+
+
+let pageTitle="";
+lang == "en" ? pageTitle = "All SMM Panel Listed on SMM Panel" : "";
+lang == "es" ? pageTitle = "Todos los paneles SMM listados en el panel SMM" : "";
+lang == "pt" ? pageTitle = "Todos os Painéis SMM listados no Painel SMM" : "";
+
+let pageMetaDescription="";
+lang == "en" ? pageMetaDescription = "Browse our comprehensive list of SMM Panels with easy pagination. Find trusted providers, compare features, and explore options to boost your social media growth effortlessly." : "";
+lang == "es" ? pageMetaDescription = "Explora nuestra lista completa de paneles SMM con una paginación sencilla. Encuentra proveedores de confianza, compara funciones y descubre opciones para impulsar tu crecimiento en redes sociales sin esfuerzo." : "";
+lang == "pt" ? pageMetaDescription = "Navega pela nossa lista completa de painéis de SMM com paginação fácil. Encontra fornecedores de confiança, compara funcionalidades e explora opções para aumentar o teu crescimento nas redes sociais sem esforço." : "";
 
 ---
 
-<MainLayoutNew lang={metaDataPt.language} havePadding={false} title={"All SMM Panel Listed on SMM Panel"} metaDescription="">
+<MainLayoutNew 
+    {lang}
+    havePadding={false} 
+    title={pageTitle} 
+    metaDescription={pageMetaDescription} 
+    translations={contentPath}>
 
     <section class="panels-container">
         <div class="relative touch-none pointer-events-none h-[60vh] bg-[url('/assets/images/cover.png')] bg-cover bg-no-repeat">
@@ -121,13 +161,14 @@ let contentPath = metaDataPt
                             {
                                 page.data.map((panel: panelStructure, index:number) => (
                                     <SMM_panelCards2New
-                                        lang={metaDataPt.language}
+                                        {lang}
                                         rating = {panel.rating}
                                         avrg = {Number(allPanelServiceCount[index][1].toFixed(2))}
                                         service={Number(allPanelServiceCount[index][0])}
                                         imageSrc = {panel.panelFeaturedImage == null ? "" : getImageBasePath() + panel.panelFeaturedImage }
                                         panelTitle={panel.panelTitle}
                                         slugURL={panel.panelSlug}
+                                        translations={contentPath}
                                     />
                                 ))
                             }
@@ -141,7 +182,7 @@ let contentPath = metaDataPt
                                 class:list={[
                                     rest.url.prev ? "bg-[#0056b3] cursor-pointer" : "bg-gray-300 cursor-not-allowed"
                                 ]}>
-                                    <i class="fa-duotone fa-chevrons-left" />
+                                    <i class="fa-solid fa-angle-left"></i>
                                 </a>
                                 <div class="paginationInfo text-center">
                                     <span class="rounded-lg p-4 h-full font-bold ">
@@ -152,7 +193,7 @@ let contentPath = metaDataPt
                                 <a href={page.url.next} class="nextbtns flex justify-center items-center cursor-pointer rounded-full size-12 bg-[#0056b3] border"class:list={[
                                     rest.url.next ? "bg-[#0056b3] cursor-pointer" : "bg-gray-300 cursor-not-allowed"
                                     ]}>
-                                    <i class="fa-duotone fa-chevrons-right" />
+                                    <i class="fa-solid fa-angle-right"></i>
                                 </a>
                             </div>
                         </div>

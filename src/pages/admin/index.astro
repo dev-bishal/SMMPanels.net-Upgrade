@@ -22,6 +22,7 @@ const response = await fetch(getAPIPath() + `auth/validate`, {
     }
 }).then(res => res.json());
 
+
 // console.log(response);
 
 if(response.status !== 200 && response.isValid !== true){
@@ -91,8 +92,8 @@ const PaymentData = await fetch(getAPIPath() + "payments", {
         "x-api-key" : key
     }
 }).then(Response => Response.json())
-        
 ---
+
 <AdminLayout PageTitle="Home" PageHeader="Dashboard" UserName={response.user.fullname || response.user.username} avatarImagePath={getImageBasePath() + response.user.ProfilePic} emailAdd = {response.user.email}>
 	<script is:inline src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -113,4 +114,3 @@ const PaymentData = await fetch(getAPIPath() + "payments", {
         }, 1000);
     });
 </script>
-

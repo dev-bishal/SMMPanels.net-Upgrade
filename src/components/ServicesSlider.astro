@@ -1,19 +1,16 @@
 ---
 import { getImageBasePath } from '../data/utils';
-import { metaDataEs } from '../pages/es/data';
-import { metaDataPt } from '../pages/pt/data';
 import ButtonUI from './ButtonUI.astro';
 import GlassLayout from './GlassLayout.astro';
 
 interface Props {
     allServicesData : any[],
     lang ?: string
+    translations ?: any
 }
 
-const {allServicesData , lang="en"} = Astro.props;
-let contentPath;
-if(lang == "es") contentPath = metaDataEs
-else if(lang == "pt") contentPath = metaDataPt
+const {allServicesData, translations, lang="en"} = Astro.props;
+let contentPath = translations
 
 let titleText;
 if(lang == "en"){
@@ -21,12 +18,10 @@ if(lang == "en"){
     ? titleText = `Available Services for ${allServicesData.length - 5 }+ Platforms`
     : titleText = `Available Service for ${allServicesData.length } Platform`
 }
-else if(lang == "es"){
-    allServicesData.length >= 10
-    ? titleText = `${contentPath?.text[6]} ${allServicesData.length - 5 }+ ${contentPath?.text[7]}`
-    : titleText = `${contentPath?.text[6]} ${allServicesData.length } ${contentPath?.text[7]}`
-}
 
+allServicesData.length >= 10
+? titleText = `${contentPath?.text[6]} ${allServicesData.length - 5 }+ ${contentPath?.text[7]}`
+: titleText = `${contentPath?.text[6]} ${allServicesData.length } ${contentPath?.text[7]}`
 ---
 <style is:inline>
     swiper-container{

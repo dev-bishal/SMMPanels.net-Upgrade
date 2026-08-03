@@ -1,9 +1,9 @@
 ---
 import GlassLayout from "../../../components/GlassLayout.astro";
 import PaymentCard from "../../../components/PaymentCard.astro";
+import { metaDataEs, metaDataPt } from "../../../data/translations";
 import { getAPIPath, getImageBasePath } from "../../../data/utils";
 import MainLayoutNew from "../../../layouts/MainLayoutNew.astro";
-import { metaDataPt } from "../data";
 
 interface paymentOptionStructure{
     id: string,
@@ -12,10 +12,45 @@ interface paymentOptionStructure{
 }
 const allPaymentOptions : paymentOptionStructure[] = await fetch(getAPIPath() + "payments").then(Response => Response.json());
 
-let contentPath = metaDataPt
+export function getStaticPaths() {
+    let path :any[] = ["es", "pt"];
+    
+    return path.map((lang : any) => {
+        return {
+            params: {
+                lang: lang
+            }
+        };
+    });
+}
+
+const { lang } = Astro.params;
+
+let contentPath : {
+    language: string;
+    text: string[];
+} = {
+    language : "",
+    text : []
+};
+
+if(lang == "es")
+    contentPath = metaDataEs;
+else if((lang == "pt"))
+    contentPath = metaDataPt;
+
+let pageTitle="";
+lang == "es" ? pageTitle = "Lista de opciones de pago compatibles con nuestros paneles SMM destacados" : "";
+lang == "pt" ? pageTitle = "Lista de opções de pagamento disponíveis nos nossos painéis SMM em destaque" : "";
+
+let pageMetaDescription="";
+lang == "es" ? pageMetaDescription = "Descubre la lista completa de métodos de pago que admiten los principales paneles de SMM. Desde PayPal y tarjetas de crédito hasta criptomonedas y pasarelas locales, encuentra opciones seguras y flexibles que se adapten a tus necesidades" : "";
+lang == "pt" ? pageMetaDescription = "Descobre a lista completa de métodos de pagamento suportados pelos principais painéis de SMM. Desde PayPal e cartões de crédito a criptomoedas e gateways locais, encontra opções seguras e flexíveis que se adaptam às tuas necessidades" : "";
 ---
 
-<MainLayoutNew lang={metaDataPt.language} havePadding={true} title="List of Payment Options Supported by our Featured SMM Panels" metaDescription="">
+<MainLayoutNew {lang} havePadding={true} 
+title={pageTitle}
+metaDescription={pageMetaDescription}>
     
     <!-- Hero Section -->
     <GlassLayout otherClass='mt-20 my-6'>
@@ -44,7 +79,7 @@ let contentPath = metaDataPt
     ]}>
         {
             allPaymentOptions.map((paymentOption : paymentOptionStructure)=>(
-                <PaymentCard img={getImageBasePath() + paymentOption.paymentLogo} panelsCount={12} title={paymentOption.paymentOptTitle} />
+                <PaymentCard {lang} img={getImageBasePath() + paymentOption.paymentLogo} panelsCount={12} title={paymentOption.paymentOptTitle} />
             ))
         }
     </section>

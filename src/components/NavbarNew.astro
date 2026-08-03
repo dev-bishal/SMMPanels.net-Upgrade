@@ -1,23 +1,17 @@
 ---
-import { metaDataEs } from '../pages/es/data';
-import { metaDataPt } from '../pages/pt/data';
+import { getRelativeLocaleUrl } from 'astro:i18n';
 
 interface Props {
     siteTitle :string
     logoImgSrc :string,
     lang ?:string,
+    translations ?: any,
     navData : any
 }
-const {logoImgSrc="", siteTitle, navData} = Astro.props;
+const {logoImgSrc="", siteTitle, navData, translations} = Astro.props;
 let {lang} = Astro.props;
 
-let langDirectory = "";
-if(lang != "en"){
-    langDirectory = "/"+ lang
-}
-let contentPath;
-if(lang == "es") contentPath = metaDataEs
-else if(lang == "pt") contentPath = metaDataPt
+let contentPath = translations;
 
 ---
  <!-- header -->
@@ -40,13 +34,13 @@ else if(lang == "pt") contentPath = metaDataPt
                     {
                         lang == "es" &&
                         navData.navLinksEs.map((link :any)=>(
-                            <li class="cursor-pointer font-semibold hover:text-[#d3d8da]"><a href={"/es" + link.href}>{link.label}</a></li>
+                            <li class="cursor-pointer font-semibold hover:text-[#d3d8da]"><a href={getRelativeLocaleUrl("es", link.href)}>{link.label}</a></li>
                         ))
                     }
                     {
                         lang == "pt" &&
                         navData.navLinksPt.map((link :any)=>(
-                            <li class="cursor-pointer font-semibold hover:text-[#d3d8da]"><a href={"/pt" + link.href}>{link.label}</a></li>
+                            <li class="cursor-pointer font-semibold hover:text-[#d3d8da]"><a href={getRelativeLocaleUrl("pt", link.href)}>{link.label}</a></li>
                         ))
                     }
                 </ul>
@@ -97,13 +91,13 @@ else if(lang == "pt") contentPath = metaDataPt
                 {
                     lang == "es" &&
                     navData.navLinksEs.map((link :any)=>(
-                        <li class="w-full"><a class="block w-full" href={"/es/" + link.href}>{link.label}</a></li>
+                        <li class="w-full"><a class="block w-full" href={getRelativeLocaleUrl("es", link.href)}>{link.label}</a></li>
                     ))
                 }
                 {
                     lang == "pt" &&
                     navData.navLinksPt.map((link :any)=>(
-                        <li class="w-full"><a class="block w-full" href={"/pt/" + link.href}>{link.label}</a></li>
+                        <li class="w-full"><a class="block w-full" href={getRelativeLocaleUrl("pt", link.href)}>{link.label}</a></li>
                     ))
                 }
             </ul>
