@@ -30,7 +30,7 @@ jobs:
             which npm
 
             # 1. Navigate to your build project directory on the VPS
-            cd /var/www/hosted_projects/SMMPanels.net/live
+            cd var/www/hosted_projects/SMMPanels.net/live
 
             # 2. Pull the latest changes
             git pull origin main
