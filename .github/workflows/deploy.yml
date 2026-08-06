@@ -1,6 +1,8 @@
 name: Deploy to VPS
 
 on:
+  workflow_dispatch:    
+  
   push:
     branches:
       - main # Change to 'master' if that is your primary branch
