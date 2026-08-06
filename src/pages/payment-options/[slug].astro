@@ -40,7 +40,7 @@ for (let i = 0; i < allPanelRes.length; i++) {
 
 <MainLayoutNew 
     title={paymentOption.paymentOptTitle} 
-    metaDescription={`List of SMM Panels that supports ${slug[0].toUpperCase()} as Payment Option`} 
+    metaDescription={`List of SMM Panels that supports ${slug.charAt(0).toUpperCase() + slug.slice(1)} as Payment Option`} 
     pageType="article"
     pageFeaturedImage={getImageBasePath() + paymentOption.paymentLogo}>
     

@@ -11,19 +11,12 @@ import { getRelativeLocaleUrl } from "astro:i18n";
 
 import { metaDataEs, metaDataPt } from "../../data/translations";
 
-export function getStaticPaths() {
-    let path :any[] = ["es", "pt"];
-    
-    return path.map((lang : any) => {
-        return {
-            params: {
-                lang: lang
-            }
-        };
-    });
-}
-
+const SUPPORTED_LOCALES = ["es", "pt"];
 const { lang } = Astro.params;
+
+if (!lang || !SUPPORTED_LOCALES.includes(lang)) {
+  return Astro.redirect('/404');
+}
 
 let contentPath : {
     language: string;
@@ -77,13 +70,14 @@ else secondListStartIndex = 3;
 ); */
 
 const allSidebarWidgetsFetch :any[] = [];
+
 ---
 <style is:inline>
     .article-Schema:nth-child(1):hover .textContent{
         transform: translate(0, 0);
     }
 </style>
-<MainLayoutNew title="Home" {lang} translations={contentPath}>
+<MainLayoutNew title={lang == "es" ? "Inicio" : "Início"} metaDescription={lang == "es" ? allSiteFetch.siteData.SiteMetaDescriptionEs : allSiteFetch.siteData.SiteMetaDescriptionPt} {lang} translations={contentPath}>
 	
 	<!-- Hero section -->
 	<GlassLayout otherClass='mt-20 my-6 px-5'>
@@ -129,7 +123,12 @@ const allSidebarWidgetsFetch :any[] = [];
     
                 <div data-aos="fade-right" class="part lg:w-1/2 h-full flex flex-col justify-center gap-5 leading-6">
                     <article class="article-Schema relative overflow-hidden flex flex-col justify-center rounded-lg transition-all ease-in-out hover:shadow-xl group">
-                        <img src={getImageBasePath() + panelsList[0].panelFeaturedImage} class="rounded-lg hover:brightness-75 w-full" />
+                        <Image src={
+                            panelsList[0].panelFeaturedImage
+                            ? getImageBasePath() + panelsList[0].panelFeaturedImage
+                            : "/assets/images/no-image-available.jpg"
+                        } width="815" height="400" alt={panelsList[0].panelTitle} class="rounded-lg hover:brightness-75 w-full" />
+                        
                         <div class="textContent absolute translate-y-full bg-[#000000e2] p-6 bottom-0 transition-all ease-in-out duration-500 w-full group-hover:translate-y-0">
                             <a class="contents hover:text-blue-300" href={getRelativeLocaleUrl(lang, "panels/"+ panelsList[0].panelSlug)}><h3 class="w-fit cursor-pointer font-bold text-xl line-clamp-2">{panelsList[0].panelTitle}</h3></a>
                             <span class="description text-xs" set:html={panelsList[0].panelMetaDescriptionES.substring(0, 150) + "..."}></span>
@@ -145,7 +144,7 @@ const allSidebarWidgetsFetch :any[] = [];
                                 <Image src={
                                     panel.panelFeaturedImage
                                     ? getImageBasePath() + panel.panelFeaturedImage
-                                    : "assets/images/no-image-available.jpg"
+                                    : "/assets/images/no-image-available.jpg"
                                 } alt={panel.panelTitle} width="440" height="225" class="rounded-lg lg:w-[15rem] w-full lg:h-[9rem] object-cover hover:brightness-75" />
                         
                                 <span class="details">

@@ -53,12 +53,13 @@ for (let i = 0; i < allPanelRes.length; i++) {
     }
 }
 
+let metaDescription = lang == "es" ? `Lista de paneles SMM que aceptan ${slug.charAt(0).toUpperCase() + slug.slice(1)} como opción de pago` : `Lista de painéis de SMM que aceitam ${slug.charAt(0).toUpperCase() + slug.slice(1)} como forma de pagamento`
 ---
 
 <MainLayoutNew 
     {lang}
     title={paymentOption.paymentOptTitle} 
-    metaDescription={`List of SMM Panels that supports ${slug[0].toUpperCase()} as Payment Option`} 
+    metaDescription={metaDescription}
     pageType="article"
     pageFeaturedImage={getImageBasePath() + paymentOption.paymentLogo}>
 

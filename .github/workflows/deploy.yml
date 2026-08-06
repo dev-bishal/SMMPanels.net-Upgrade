@@ -1,17 +1,17 @@
-name: Deploy SMMPanels.net Astro App
+name: Deploy to VPS
 
 on:
   push:
     branches:
-      - main
+      - main # Change to 'master' if that is your primary branch
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy to VPS
-        uses: appleboy/ssh-action@v1.2.0
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
@@ -27,7 +27,14 @@ jobs:
             which node
             which npm
 
-            echo "Building Astro..."
-            curl http://128.140.35.62:4322/?Task=Full&token=${{ secrets.WEBHOOK_TOKEN}}
+            # 1. Navigate to your build project directory on the VPS
+            cd /var/www/hosted_projects/SMMPanels.net/live
 
-            echo "Deployment Started successfully!"
+            # 2. Pull the latest changes
+            git pull origin main
+
+            echo "Building Astro..."
+            # 3. Execute your link / curl command
+            curl --fail "http://128.140.35.62:4322/deploy?key=${{ secrets.WEBHOOK_TOKEN }}"
+
+            echo "Webhook Called..."

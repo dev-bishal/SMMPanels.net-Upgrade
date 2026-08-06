@@ -106,10 +106,9 @@ const allSidebarWidgetsFetch :any[] = [];
                         <Image src={
                             panelsList[0].panelFeaturedImage
                             ? getImageBasePath() + panelsList[0].panelFeaturedImage
-                            : "assets/images/no-image-available.jpg"
-                        } alt={panelsList[0].panelTitle} width="815" height="400" class="rounded-lg hover:brightness-75 w-full" />
+                            : "/assets/images/no-image-available.jpg"
+                        } width="815" height="400" alt={panelsList[0].panelTitle} class="rounded-lg hover:brightness-75 w-full" />
 
-                        
                         <div class="textContent absolute translate-y-full bg-[#000000e2] p-6 bottom-0 transition-all ease-in-out duration-500 w-full group-hover:translate-y-0">
                             <a class="contents hover:text-blue-300" href={"/panels/"+ panelsList[0].panelSlug}><h3 class="w-fit cursor-pointer font-bold text-xl line-clamp-2">{panelsList[0].panelTitle}</h3></a>
                             <span class="description text-xs" set:html={panelsList[0].panelMetaDescription.substring(0, 150) + "..."}></span>
@@ -125,7 +124,7 @@ const allSidebarWidgetsFetch :any[] = [];
                                 <Image src={
                                     panel.panelFeaturedImage
                                     ? getImageBasePath() + panel.panelFeaturedImage
-                                    : "assets/images/no-image-available.jpg"
+                                    : "/assets/images/no-image-available.jpg"
                                 } alt={panel.panelTitle} width="440" height="225" class="rounded-lg lg:w-[15rem] w-full lg:h-[9rem] object-cover hover:brightness-75" />
                         
                                 <span class="details">

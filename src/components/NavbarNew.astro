@@ -146,7 +146,7 @@ mobileHamburgerBtn.addEventListener("click", () => {
 
     //Detecting if there is language from the local storage
     let changeLangBtns = document.querySelectorAll('.language-selector');
-    let langArray = ["ZH", "RU", "ES", "FR", "HI", "BN", "PT", "UR", "ID"];
+    let langArray = ["ES", "PT"];
     if(localStorage.getItem("lang") == null){
         if(langArray.includes(window.location.pathname.substring(1, 3).toUpperCase()))
             localStorage.setItem("lang", window.location.pathname.substring(1, 3));

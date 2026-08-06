@@ -188,7 +188,7 @@ async function updateAPIWorking(id:string, status : boolean){
                         <Image src={
                             panel.panelFeaturedImage
                             ? getImageBasePath() + panel.panelFeaturedImage
-                            : "assets/images/no-image-available.jpg"
+                            : "/assets/images/no-image-available.jpg"
                         } alt={panel.panelTitle + " Panel Image"} width="700" height="350" class="shadow-lg rounded-lg lg:h-75" />
                         
                         <span class="flex gap-3 items-center justify-center text-center">
@@ -326,9 +326,9 @@ async function updateAPIWorking(id:string, status : boolean){
                     </GlassLayout>
                 </div>
                 
-                <div class="modal-container invisible fixed size-full top-0 left-0 z-10 flex justify-center items-center">
+                <div class="modal-container invisible fixed h-screen top-0 left-0 z-10 flex justify-center items-center">
                     
-                    <div class="modal-content rounded-lg backdrop-blur-sm bg-[#000000c7] size-[85%] flex justify-center items-center">
+                    <div class="modal-content rounded-lg backdrop-blur-sm bg-[#000000c7] w-[85%] h-[75%] flex justify-center items-center">
                         <div class="closeBtn cursor-pointer fixed size-6 flex justify-center items-center -right-4 -top-4 bg-red-600 text-white rounded-full p-4">
                             <i class="fa-solid fa-xmark"></i>
                         </div>

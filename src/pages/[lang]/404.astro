@@ -1,0 +1,30 @@
+---
+import MainLayoutNew from "../../layouts/MainLayoutNew.astro";
+
+
+const SUPPORTED_LOCALES = ["es", "pt"];
+const { lang } = Astro.params;
+
+// Fallback if someone hits /324/404 directly
+if (!lang || !SUPPORTED_LOCALES.includes(lang)) {
+  return Astro.redirect("/404");
+}
+
+---
+
+<MainLayoutNew 
+title={lang == "es" ? "PÁGINA NO ENCONTRADA" : "PÁGINA NÃO ENCONTRADA"} 
+metaDescription={lang == "es" ? "PÁGINA NO ENCONTRADA" : "PÁGINA NÃO ENCONTRADA"}
+{lang}
+>
+    <div class="content-wrapper text-white flex flex-wrap lg:justify-start justify-center gap-5 my-6 px-5 lg:mt-24 mt-20">
+        <div class="404Content py-8 gap-y-7 size-full flex flex-col justify-center items-center">
+            <h1 class="text-2xl">{lang == "es" ? "¡OOOOPS!! ERROR 404" : "OOOOPS!! ERRO 404"} </h1>
+            <span class="text-4xl">{lang == "es" ? "PÁGINA NO ENCONTRADA" : "PÁGINA NÃO ENCONTRADA"}</span>
+            <p>{lang == "es" ?  "Podría haber sido eliminada, renombrada o estar temporalmente no disponible. ¡Vamos a la página principal!" : "Pode ter sido removida, renomeada ou estar temporariamente indisponível. Vamos para a página inicial!"}</p>
+
+            <a href={"/"+ lang + "/"} class="rounded px-4 py-2 bg-[#0056b3] text-white"><i class="fa-solid fa-house"></i> {lang == "es" ? "Inicio" : "Início"}</a>
+
+        </div>
+    </div>
+</MainLayoutNew>

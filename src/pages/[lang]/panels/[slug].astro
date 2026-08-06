@@ -211,6 +211,7 @@ if(lang == "es")
     contentPath = metaDataEs;
 else if((lang == "pt"))
     contentPath = metaDataPt;
+
 ---
 
 <style is:inline>
@@ -272,7 +273,7 @@ else if((lang == "pt"))
     title={panel.panelTitle} 
     translations={contentPath}
     metaDescription={
-    lang == "es" ? panel.panelMetaDescriptionES : panel.panelMetaDescriptionPt
+    lang == "es" ? panel.panelMetaDescriptionES : panel.panelMetaDescriptionPT
     } 
     pageType="article"
     pageFeaturedImage={getImageBasePath() + panel.panelFeaturedImage}>
@@ -294,7 +295,7 @@ else if((lang == "pt"))
                                 
                                 <a target="_blank"
                                     class="block rounded-lg p-3 bg-blue-600 hover:bg-blue-700 text-white"
-                                    href="/es/panels">{contentPath.text[31]}</a>
+                                    href={getRelativeLocaleUrl(lang, "/panels")}>{contentPath.text[31]}</a>
                             </span>
                         
                     </span>
@@ -358,7 +359,7 @@ else if((lang == "pt"))
                                 panel.ratingOtherSites.map((rating:any)=>(
                                     rating.ratingURL != "" &&
                                     (
-                                        <a target="_blank"href={rating.ratingURL} class="reviewsBox lg:w-[30%] text-[#0056b3] text-center md:w-1/2 w-full mb-4 flex flex-col items-center bg-white p-3 rounded-md shadow-md">
+                                        <a target="_blank" href={rating.ratingURL} class="reviewsBox lg:w-[30%] text-[#0056b3] text-center md:w-1/2 w-full mb-4 flex flex-col items-center bg-white p-3 rounded-md shadow-md">
                                             <img src={ "/assets/images/" + 
                                                 (rating.ratingSite == "TrustPilot" ? "trustpilotlogo.webp"
                                                 :
@@ -402,7 +403,7 @@ else if((lang == "pt"))
                                         <div class="row flex w-full p-2 gap-x-2">
                                             <div class="col w-[40%] flex gap-2">
                                                 {
-                                                    <a href={"/payment-options/"+paymentOp.payOption.toLowerCase().replaceAll(" ", "-").replaceAll("/", "-")}>
+                                                    <a href={getRelativeLocaleUrl(lang, "/payment-options/"+paymentOp.payOption.toLowerCase().replaceAll(" ", "-").replaceAll("/", "-"))}>
                                                         <img height="30px" src={getImageBasePath() + getPaymentOptImgLink(paymentOp.payOption).paymentLogo} class="h-[30px] object-contain hover:scale-105 max-w-[50px]" alt={paymentOp.payOption} />
                                                     </a>
                                                 }
@@ -422,9 +423,9 @@ else if((lang == "pt"))
                     </GlassLayout>
                 </div>
                 
-                <div class="modal-container invisible fixed size-full top-0 left-0 z-10 flex justify-center items-center">
+                <div class="modal-container invisible fixed h-screen top-0 left-0 z-10 flex justify-center items-center">
                     
-                    <div class="modal-content rounded-lg backdrop-blur-sm bg-[#000000c7] size-[85%] flex justify-center items-center">
+                    <div class="modal-content rounded-lg backdrop-blur-sm bg-[#000000c7] w-[85%] h-[75%] flex justify-center items-center">
                         <div class="closeBtn cursor-pointer fixed size-6 flex justify-center items-center -right-4 -top-4 bg-red-600 text-white rounded-full p-4">
                             <i class="fa-solid fa-xmark"></i>
                         </div>

@@ -18,10 +18,12 @@ if(lang == "en"){
     ? titleText = `Available Services for ${allServicesData.length - 5 }+ Platforms`
     : titleText = `Available Service for ${allServicesData.length } Platform`
 }
+else{
+    allServicesData.length >= 10
+    ? titleText = `${contentPath?.text[6]} ${allServicesData.length - 5 }+ ${contentPath?.text[7]}`
+    : titleText = `${contentPath?.text[6]} ${allServicesData.length } ${contentPath?.text[7]}`
+}
 
-allServicesData.length >= 10
-? titleText = `${contentPath?.text[6]} ${allServicesData.length - 5 }+ ${contentPath?.text[7]}`
-: titleText = `${contentPath?.text[6]} ${allServicesData.length } ${contentPath?.text[7]}`
 ---
 <style is:inline>
     swiper-container{

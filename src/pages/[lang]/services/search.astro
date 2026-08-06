@@ -12,20 +12,12 @@ const allPanelsFetch: any = await fetch(getAPIPath() + "panels").then(
     (Response) => Response.json(),
 );
 
-
-export function getStaticPaths() {
-    let path :any[] = ["es", "pt"];
-    
-    return path.map((lang : any) => {
-        return {
-            params: {
-                lang: lang
-            }
-        };
-    });
-}
-
+const SUPPORTED_LOCALES = ["es", "pt"];
 const { lang } = Astro.params;
+
+if (!lang || !SUPPORTED_LOCALES.includes(lang)) {
+  return Astro.redirect('/404');
+}
 
 let contentPath : {
     language: string;
