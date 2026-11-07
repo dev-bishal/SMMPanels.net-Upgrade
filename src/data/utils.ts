@@ -1,7 +1,7 @@
 import edjsHTML from 'editorjs-html';
 
 function getAPIPath() {
-    return "https://api-collections.vercel.app/api/smmpanels.net/"
+    return "https://apicollections2.vercel.app/api/smmpanels.net/"
     return "http://localhost:4322/api/smmpanels.net/"
 }
 
